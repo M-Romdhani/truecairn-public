@@ -1,0 +1,38 @@
+{
+  "source": "Frozen libsodium-wrappers-sumo Argon2id outputs with our production parameters (opslimit=4, memlimit=256 MiB, parallelism=1). See kek.test.ts comment for the regenerable CLI command. These are the same trust-class as the Argon2id KAT in @truecairn/crypto — they verify our wrapper is calling Argon2id with the locked params and have not silently changed.",
+  "passphraseKek": {
+    "passphraseAscii": "correct horse battery staple",
+    "saltHex": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf",
+    "expectedKekHex": "1e88761c52cacb80254e7ac9683c7257e0be04b0d485b22e09addf301a090f22"
+  },
+  "recoveryKek": {
+    "codeHex": "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
+    "saltHex": "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf",
+    "expectedKekHex": "3a278da85c2fc685137d732de0fe1624899901216836464690fc75e66646b05f"
+  },
+  "releasePassphraseSharePerCallSaltConstruction": {
+    "comment": "Per-call salt = crypto_kdf_derive_from_key(extendedKey=BLAKE2b256(baseSalt), ctx='tc-relsl', subkey_id=(tier_byte<<8)|shareIndex, len=16). The KAT pins BOTH the intermediate per-call salt AND the final share bytes. If a regression accidentally reuses the base salt for two different (tier, shareIndex) calls, the per-call salts would collide; pinning the intermediate makes that visible.",
+    "baseSaltHex": "c0c1c2c3c4c5c6c7c8c9cacbcccdcecf",
+    "passphraseAscii": "release-passphrase-test"
+  },
+  "releasePassphraseShares": [
+    {
+      "tier": "s3",
+      "shareIndex": 4,
+      "expectedPerCallSaltHex": "b0ad45e06c3232118f8a08e0fb437f8b",
+      "expectedShareBytesHex": "04817b4b665fabeb39627977d0f61b3727812832d295437164ed2bb317f7f5fc33"
+    },
+    {
+      "tier": "s2",
+      "shareIndex": 3,
+      "expectedPerCallSaltHex": "9813731e52e8b4c42913d6b29e180960",
+      "expectedShareBytesHex": "03cfbf23a99d30b2db834d980f7779df730711f88f059da21552b11b4057dda11f"
+    },
+    {
+      "tier": "s3",
+      "shareIndex": 1,
+      "expectedPerCallSaltHex": "277593ebee4207b11cfa97ae2a5dfdc2",
+      "expectedShareBytesHex": "0143c7d05dd973de409ed3b39db2c9ddaa4c1150b73e19d3abdd7effd1c6be17f3"
+    }
+  ]
+}

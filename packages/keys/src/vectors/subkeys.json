@@ -1,0 +1,32 @@
+{
+  "source": "Frozen libsodium-wrappers-sumo crypto_kdf_derive_from_key output for the (context, subkey_id) pairs declared in types.ts. Same trust-class as @truecairn/crypto's kdf-subkey KAT — verifies that the master key is being fed through the correct domain separators with the correct ids, and would catch any silent change to KDF_CONTEXT_AUDIT, KDF_CONTEXT_WRAP, KDF_CONTEXT_VAULT_CAPTURE, KDF_SUBKEY_ID_AUDIT_SIGNING, KDF_SUBKEY_ID_TIER_WRAPPING or KDF_SUBKEY_ID_VAULT_CAPTURE.",
+  "masterKeyHex": "abababababababababababababababababababababababababababababababab",
+  "auditSigningSeedHex": "72afa49f58ecc0dbf5272f9a78f84dc89847fe2e0703eb8c55610a6b2923ad16",
+  "tierWrappingKeyHex": "2cd01887ca325147fbdcaf40797cb59b7408385425fcb099acf6cdad6b35b280",
+  "vaultCapture": {
+    "note": "docs/34 — the owner's write-only capture keypair. The PUBLIC key is pinned as well as the seed because it is the value that actually leaves the browser and reaches a phone: a derivation change that altered it would strand every capture already sealed to the old key, and pinning only the seed would not catch a change in how the keypair is built from that seed.",
+    "seedHex": "562123bc3690bccc26aedfb7700bea81f8c118c4d2b9f49feef383a585a77060",
+    "publicKeyHex": "59831d399bb83cfd2a201e98c1172e22f5d158dbd4b9a7e9dac44503effb0a09"
+  },
+  "contactBindingV2": {
+    "comment": "Per-relationship contact seeds (v2). root = crypto_kdf_derive_from_key(masterKey, ctx='tc-cbind', subkey_id=1, len=32); seed = BLAKE2b(key=root, msg=utf8(purpose + relationshipId), outlen=32) with purpose 'x25519:' or 'ed25519:'. Two relationships are pinned deliberately: one proves determinism, two prove UNLINKABILITY — the property the whole change exists for, and the one a naive reimplementation (ignoring relationshipId, or appending it instead of prefixing the purpose) would silently lose while still passing a single-vector check.",
+    "relationships": [
+      {
+        "relationshipId": "11111111-1111-4111-8111-111111111111",
+        "x25519SeedHex": "f35563d102e55a183219c4e88a6e9050fef2ad9eef4b85f9114832dcbe55cea7",
+        "ed25519SeedHex": "9446efadb58bfbe71d65a0b7359b1302607c1842f7d5d9ebb8aff0c56fb781a0"
+      },
+      {
+        "relationshipId": "22222222-2222-4222-8222-222222222222",
+        "x25519SeedHex": "cc32863cd04f9c3f2e438c62b48aac205f0a4fa04d7623a556feb18f28353410",
+        "ed25519SeedHex": "ef6de15d078cb986613af0859a553690d14e02457bbeed904764e892b9022bc8"
+      }
+    ]
+  },
+  "contactPin": {
+    "note": "F1+F2 (PLAN-v1-launch.md §1.2). The master-derived key that encrypts contact display labels and key pins, moving them off the S1 TIER key — which is sealed to the S1 beneficiary and unsealed in their browser on release, so it let one recipient read the owner's private labels for every contact, including S2/S3-only ones. Context is 'tc-cmeta', NOT the plan's 'tc-cpin': that string is 7 bytes and crypto_kdf_derive_from_key requires exactly 8, so the plan's name throws at the first call. Pinned because a silent change to the context or subkey id would re-derive a different key and make every stored label unreadable.",
+    "context": "tc-cmeta",
+    "subkeyId": 1,
+    "contactPinKeyHex": "e8ccd1956cedfbfcde21cfa1885be160bcde496d69a2486865893fcabc1d4410"
+  }
+}

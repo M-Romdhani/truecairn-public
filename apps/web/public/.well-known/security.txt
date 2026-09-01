@@ -1,0 +1,17 @@
+# Truecairn — security contact (RFC 9116)
+#
+# If you have found a vulnerability, please tell us here. We would rather hear
+# about it than not, and we will not pursue anyone who reports in good faith.
+# The full policy — scope, what we ask of you, and what you can expect back —
+# is at the Policy URL below.
+#
+# Expires is not decoration: consumers treat a lapsed file as no file at all,
+# so it is pinned by apps/api/src/security-txt.test.ts, which turns red well
+# before the date passes. Renew the date there and here together.
+
+Contact: mailto:security@truecairn.app
+Contact: https://truecairn.app/security/disclosure
+Expires: 2027-08-27T00:00:00.000Z
+Preferred-Languages: en, es
+Canonical: https://truecairn.app/.well-known/security.txt
+Policy: https://truecairn.app/security/disclosure

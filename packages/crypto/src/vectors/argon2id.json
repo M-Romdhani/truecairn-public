@@ -1,0 +1,22 @@
+{
+  "source": "Frozen libsodium-wrappers output. See kdf.test.ts comment for the regenerable CLI command used to independently cross-check these values.",
+  "notes": "libsodium's crypto_pwhash does not expose the `secret` / `ad` inputs that RFC 9106 vectors use, so RFC 9106 vectors are not directly applicable. Values below are frozen libsodium output and serve as: (a) regression detection if our wiring or parameter mapping changes, (b) algorithm-enum detection (ARGON2I13 produces different output for the same inputs), (c) a deterministic reference for QA.",
+  "lowParams": {
+    "comment": "Fast vector for the routine test suite. opslimit=2, memlimit=8 MiB.",
+    "passwordAscii": "correct horse battery staple",
+    "salt": "0123456789abcdef0123456789abcdef",
+    "opslimit": 2,
+    "memlimit": 8388608,
+    "outputLength": 32,
+    "expectedKey": "bfd60a03ff841975ba82d505457fb31442fc55d68b0f611b63ee2e1b0ba7f904"
+  },
+  "productionParams": {
+    "comment": "Production-params vector. Slow (~1-2s). Run once to verify we have not silently changed the locked parameters.",
+    "passwordAscii": "production-params-check",
+    "salt": "fedcba9876543210fedcba9876543210",
+    "opslimit": 4,
+    "memlimit": 268435456,
+    "outputLength": 32,
+    "expectedKey": "7cfa355af4b35aa64592cfbb612876e451165bb1068b3dec3bfabbdad780342f"
+  }
+}

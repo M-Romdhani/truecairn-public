@@ -1,0 +1,302 @@
+/* ===========================================================================
+   Dashboard (Home) — Linear-style sidebar + main, ported from the design
+   dashboard.css. Depends on the design system (styles/design-system.css) for
+   tokens, .card, .btn, .badge, .avi. Class-only (SPA CSP forbids inline styles).
+   =========================================================================== */
+.app-shell {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.sidebar {
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  padding: 14px 12px;
+  display: flex; flex-direction: column;
+  gap: 14px;
+  position: sticky; top: 0; height: 100vh;
+}
+.sb-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px;
+  font-size: 14px; font-weight: 500;
+  color: var(--text-1);
+  position: relative;
+  text-decoration: none;
+}
+/* A real <button> that opens the ⌘K palette. It was a <div> wrapping an inert
+   <input>, so it took a caret and swallowed typing; the styling is unchanged
+   apart from what a button needs (reset appearance, left-align, pointer). */
+.sb-search {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-3);
+  transition: border-color var(--t);
+  font-family: inherit; font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.sb-search:hover { border-color: var(--border-strong); }
+.sb-search:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring-focus);
+}
+.sb-search-label { flex: 1; min-width: 0; color: var(--text-3); }
+.sb-search .kbd { margin-left: auto; }
+
+.sb-nav { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+.sb-section {
+  font-size: 11px; color: var(--text-3);
+  letter-spacing: .04em;
+  padding: 14px 10px 4px;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--text-2);
+  text-decoration: none;
+  border-radius: var(--r-sm);
+  transition: background var(--t), color var(--t);
+}
+.sb-item:hover { background: rgba(15,23,42,.04); color: var(--text-1); }
+.sb-item.active {
+  background: var(--surface);
+  color: var(--text-1);
+  box-shadow: 0 1px 0 rgba(15,23,42,.04), 0 0 0 1px var(--border) inset;
+}
+.sb-item .sb-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.sb-foot {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px;
+  border-top: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background var(--t);
+}
+.sb-foot:hover { background: rgba(15,23,42,.04); }
+.sb-foot .stack { flex: 1; min-width: 0; }
+
+/* ——— Main column ——— */
+.main { min-width: 0; }
+.main-inner {
+  max-width: 1180px;
+  padding: 32px 40px 80px;
+  margin: 0;
+}
+
+/* ——— Page header ——— */
+.page-head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 32px;
+  gap: 24px;
+}
+.page-head .hint {
+  font-size: 12px; color: var(--text-3);
+  letter-spacing: .02em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+.page-head .h-page { margin-bottom: 4px; }
+
+/* ——— Card header ——— */
+.card-h {
+  padding: 18px 20px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.card-h h2 { font-size: 15px; font-weight: 500; }
+.card-h .small { margin-top: 2px; }
+
+/* ——— Readiness hero ——— */
+.readiness {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: 24px;
+  padding: 24px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+.readiness-left {
+  display: flex; align-items: center; gap: 20px;
+  padding-right: 24px;
+  border-right: 1px solid var(--border);
+}
+.readiness-ring { transform: rotate(-90deg); }
+.readiness-ring-fill { transition: stroke-dashoffset 600ms ease; }
+.readiness-num .ro-val {
+  font-size: 36px; font-weight: 500;
+  line-height: 1.05;
+  color: var(--text-1);
+  letter-spacing: -.022em;
+  font-variant-numeric: tabular-nums;
+}
+.readiness-num .ro-of { font-size: 16px; color: var(--text-3); margin-left: 2px; font-weight: 400; }
+.readiness-num .ro-cap { font-size: 12px; color: var(--text-2); margin-top: 4px; }
+/* Stated in words next to the number, because the number alone cannot carry it:
+   a single blocker still scores 80, and 80 reads as a good result. */
+.readiness-num .ro-blocked {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warning);
+  margin-top: 6px;
+  max-width: 20ch;
+}
+
+.readiness-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+/* Full width beneath the ring and the tiles, in both the 2-column and the stacked
+   mobile layout (the media query below drops .readiness to one column). */
+.readiness-note {
+  grid-column: 1 / -1;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.tile { padding: 0 16px; border-right: 1px solid var(--border); min-width: 0; }
+.tile:first-child { padding-left: 0; }
+.tile:last-child { border-right: none; padding-right: 0; }
+.tile-label { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
+.tile-val   { font-size: 22px; font-weight: 500; color: var(--text-1); line-height: 1.1; letter-spacing: -.018em; font-variant-numeric: tabular-nums; }
+.tile-sub   { font-size: 12px; color: var(--text-2); margin-top: 6px; line-height: 1.45; }
+
+/* ——— Two-column grid for sections ——— */
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ——— List rows used inside cards ——— */
+.list { margin: 0; padding: 0; list-style: none; }
+.list-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.list-row:last-child { border-bottom: none; }
+.list-row:hover { background: #FCFCFB; }
+
+/* ——— Priority dot for checkups ——— */
+.prio {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.prio.prio-high { background: #FEF2F2; color: var(--danger); }
+.prio.prio-med  { background: var(--warning-soft); color: var(--warning); }
+.prio.prio-low  { background: #F1F5F9; color: var(--text-3); }
+
+/* ——— Empty state ——— */
+.empty { padding: 24px 20px 28px; text-align: left; }
+.empty-line { width: 32px; height: 1px; background: var(--border-strong); margin-bottom: 12px; }
+
+/* ——— Small helpers for this screen (class-only, CSP) ——— */
+.min-w-0 { min-width: 0; }
+.row-title { font-size: 14px; font-weight: 500; color: var(--text-1); }
+.row-meta { min-width: 70px; text-align: right; }
+
+/* ——— Mobile top bar + drawer overlay (audit B1) ———
+   Desktop renders the sticky sidebar as a grid column and hides these two. Below
+   the 900px breakpoint the sidebar becomes an off-canvas drawer (see the media
+   query) and the top bar's hamburger toggles it; the overlay catches outside
+   taps. Class-only (CSP forbids inline styles); the open/closed state is a class
+   set by AppShell. */
+.mobile-topbar { display: none; }
+.nav-overlay { display: none; }
+
+/* ——— Responsive ——— */
+@media (max-width: 900px) {
+  .app-shell { grid-template-columns: 1fr; }
+
+  /* The sidebar slides in from the left instead of vanishing. It stays in the DOM
+     (so the lock-status footer and nav remain reachable) but is translated off
+     screen until .open. */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 264px; max-width: 84vw;
+    height: 100vh;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform var(--t-modal);
+    box-shadow: 0 0 0 1px var(--border), 8px 0 24px rgba(15, 23, 42, 0.08);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .mobile-topbar {
+    display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 40;
+    padding: 10px 16px;
+    background: rgba(250, 250, 249, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .mobile-topbar .mt-brand {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 500; color: var(--text-1);
+    text-decoration: none;
+  }
+  .nav-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--text-1);
+    cursor: pointer;
+  }
+  .nav-overlay {
+    display: block;
+    position: fixed; inset: 0;
+    z-index: 45;
+    background: rgba(15, 23, 42, 0.32);
+  }
+
+  .main-inner { padding: 24px 20px 64px; }
+  .readiness { grid-template-columns: 1fr; }
+  .readiness-left { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 20px; }
+  .readiness-grid { grid-template-columns: 1fr 1fr; gap: 16px 0; }
+  .grid-2col { grid-template-columns: 1fr; }
+}
+
+/* ——— Checkup rows that can open in place ——— */
+.checkup-row { flex-direction: column; align-items: stretch; gap: 0; }
+.checkup-steps { align-items: flex-end; flex: none; }
+
+/* A blocker segment is the warning colour, not the neutral one: the point of the
+   strip is telling "would stop a release today" apart from "could be tidier". */
+.steps .seg.blocker { background: var(--warning); }
+
+.checkup-panel {
+  width: 100%;
+  margin-top: 14px;
+  padding-top: var(--md);
+  border-top: 1px dashed var(--border);
+}
+/* CreateItem draws its own card; nested inside a list row that is one border too
+   many, so flatten it and let the row provide the edge. */
+.checkup-panel > .card {
+  border: none;
+  padding: 0;
+  background: none;
+}

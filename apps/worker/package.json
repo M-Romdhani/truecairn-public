@@ -1,0 +1,28 @@
+{
+  "name": "@truecairn/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --passWithNoTests",
+    "start": "tsx src/main.ts",
+    "dev": "tsx watch src/main.ts"
+  },
+  "dependencies": {
+    "@truecairn/ai-authority": "workspace:*",
+    "@truecairn/audit": "workspace:*",
+    "@truecairn/ceremony": "workspace:*",
+    "@truecairn/crypto": "workspace:*",
+    "@truecairn/db": "workspace:*",
+    "@truecairn/engine": "workspace:*",
+    "@truecairn/notifications": "workspace:*",
+    "@truecairn/ops": "workspace:*",
+    "@truecairn/sensitive-actions": "workspace:*",
+    "@truecairn/shared": "workspace:*",
+    "@truecairn/vault": "workspace:*",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.5"
+  }
+}

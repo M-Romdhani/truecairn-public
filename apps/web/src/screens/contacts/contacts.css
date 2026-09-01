@@ -1,0 +1,110 @@
+/* Contacts-screen helpers (scoped). The design system provides tokens + cards. */
+.tier-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.cb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-1);
+  cursor: pointer;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: border-color var(--t), background var(--t);
+}
+.cb-row:hover {
+  border-color: var(--border-strong);
+}
+.cb-row input {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+/* A contact row that can expand to hold the security-code panel underneath.
+   .list-row is a flex ROW; the panel needs to sit below the row's controls, not
+   beside them, so this switches the axis without touching the shared rule. */
+.list-row-stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+/* The out-of-band security code. Tabular figures and generous tracking because
+   this string exists to be read aloud, digit by digit, to someone on a phone —
+   and to be compared against another screen by eye. Proportional digits make
+   transposed pairs easy to miss, which is the one error that matters here. */
+.code-digits {
+  font-family: ui-monospace, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  line-height: 1.7;
+  color: var(--text-1);
+  background: #FCFCFB;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  word-spacing: 0.5em;
+  /* Long enough to wrap on a phone; wrapping mid-group would break the
+     read-aloud rhythm, so break between groups only. */
+  overflow-wrap: normal;
+}
+
+.invite-token {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-2);
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+}
+.invite-token code {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  color: var(--text-1);
+  background: #FCFCFB;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+  word-break: break-all;
+}
+
+/* ——— "This split, as it stands" ———
+   A sunken panel inside the split card: what the split currently contains, what
+   the threshold means, and which conditions are still outstanding. */
+.split-state {
+  padding: var(--md);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.split-checks { list-style: none; margin: 0; padding: 0; }
+
+.split-mark {
+  flex: none;
+  width: 1em;
+  text-align: center;
+  color: var(--text-3);
+}
+.split-mark.ok { color: var(--success-ink); }
+
+/* The page-head progress is a read-out, not a control. .steps carries a :hover
+   from its interactive use elsewhere, which on a static indicator reads as
+   "click me". */
+.page-head .steps { pointer-events: none; }
+
+/* Segmented tier control in the split card header. `selected` is the accent ring
+   the design uses for a chosen option elsewhere, not a filled button — the two
+   tiers are peers and neither is the primary action. */
+.btn.secondary.selected {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--ring-focus);
+}

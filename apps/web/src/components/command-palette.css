@@ -1,0 +1,114 @@
+/* ——— Command palette (⌘K) ———
+   One overlay, one card, three bands: query, results, footer. The card reuses the
+   product's own surface/border/radius tokens rather than inventing a dialog look,
+   so it reads as the same material as every card behind it. */
+
+.pal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--wash-scrim);
+  display: flex;
+  justify-content: center;
+  /* flex-start, NOT the default stretch: without it the card is pulled to the
+     full max-height and the footer floats mid-panel over dead space. */
+  align-items: flex-start;
+  padding-top: 12vh;
+  animation: pal-fade var(--t) ease-out;
+}
+
+@keyframes pal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.pal {
+  width: 100%;
+  max-width: 620px;
+  max-height: 60vh;
+  margin: 0 var(--md);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-popover);
+  overflow: hidden;
+}
+
+.pal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-3);
+}
+
+.pal-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text-1);
+}
+.pal-input::placeholder { color: var(--text-3); }
+
+.pal-list {
+  overflow-y: auto;
+  /* min-height:0 lets the list actually shrink inside the flex column so its own
+     scrollbar appears, instead of pushing the footer past the card's max-height. */
+  min-height: 0;
+  padding: 6px;
+}
+
+.pal-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--text-1);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--t);
+}
+/* Selection is driven by the cursor, not by :hover — the keyboard and the mouse
+   move the same highlight, so there is never a second one competing with it. */
+.pal-row.active { background: var(--wash-hover); }
+
+.pal-row-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pal-row-group { font-size: 12px; flex: none; }
+
+.pal-empty { padding: 20px 12px 24px; }
+
+.pal-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--md);
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-sunken);
+}
+.pal-foot-note { margin-left: auto; }
+
+@media (max-width: 640px) {
+  .pal-scrim { padding-top: 6vh; }
+  /* The two keyboard hints are noise on a touch device; the local-only promise
+     is not, so that one stays. */
+  .pal-foot .small:not(.pal-foot-note) { display: none; }
+}

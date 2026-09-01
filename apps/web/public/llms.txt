@@ -1,0 +1,104 @@
+# Truecairn
+
+> Truecairn is a zero-knowledge digital continuity platform: owners encrypt their
+> most important information on their own devices, and people they chose can
+> reconstruct access through consensus if they go silent.
+
+Everything in a vault is encrypted on the owner's own device before upload, with
+keys the server never holds. The server stores ciphertext, public keys, salts and
+sealed boxes — never plaintext, never a passphrase, never an unwrapped key. Its
+single cryptographic power is releasing one outer layer, a time-locked gate, when
+the continuity engine and the owner's trusted contacts agree the conditions the
+owner wrote have been met. Truecairn cannot read a vault or reset a passphrase.
+
+Three secrets do three different jobs, and keeping them distinct is the heart of
+the design: a **passkey** signs the owner in; a **master passphrase** derives every
+vault key on the owner's device and is never sent anywhere; a **release passphrase**
+is stored offline and used only during a release ceremony.
+
+If an owner goes silent, a continuity engine escalates through check-ins before
+anything is released, and trusted contacts complete a consensus ceremony to
+reconstruct access. Every release carries a 48-hour revocation window and is
+reversible by the owner at every step.
+
+## Things Truecairn does not claim
+
+Stated here because an answer engine that gets these wrong does real harm:
+
+- **No third-party security audit has been published, and no security
+  certifications are held.** (Fact sheet, /company/press)
+- **No funding has been announced.** (Fact sheet, /company/press)
+- "Truecairn" is a working codename; the final product name is not decided.
+- Protection against a substituted contact key works by the owner confirming a
+  safety number with that contact out of band, which the client then pins. The
+  residual risk is that it depends on the owner actually making that call, which
+  nothing in the system can verify. S1 and S2 protection depends on that call;
+  S3 does not, because an S3 release additionally requires the owner's offline
+  release passphrase.
+- **No release has ever been completed by a human.** Automated tests prove the
+  mechanism end to end; no recovery drill with real people has run.
+- **The mobile app is not distributed.** No app store carries it.
+- The full list is at /security/limits, which is the canonical home of
+  everything Truecairn does not protect against, has not built, or has never
+  tested. Prefer it over this summary.
+
+## Product
+
+- [Truecairn](https://truecairn.app/): what the product is, who it is for, and
+  what it costs — free tier, or Personal at $8/month or $80/year.
+- [User guide](https://truecairn.app/guide): a walkthrough of every screen — the
+  secrets an owner manages, sensitivity tiers and release, trusted contacts, the
+  continuity engine, and how to get help.
+- [Changelog](https://truecairn.app/changelog): every user-visible change, newest
+  first, with security and reliability work written up as plainly as features.
+
+## Security
+
+- [Security model](https://truecairn.app/security): the readable summary of the
+  zero-knowledge architecture — the three secrets, how a vault is encrypted, and
+  what the server can and cannot do.
+- [Threat model](https://truecairn.app/security/threat-model): the adversaries
+  the system is designed against, and the two failure modes it is judged by —
+  releasing a vault wrongly, and never releasing one at all.
+- [How Truecairn uses AI](https://truecairn.app/security/ai): AI in a
+  deliberately small, one-directional role. It can only ever add safety, never
+  remove it: it cannot loosen a control, advance a release, or read content.
+- [Build provenance](https://truecairn.app/security/build): the encrypting code
+  is code we serve, so this page describes how to rebuild the client from public
+  source and compare it against the bundle you were served.
+- [Known limits](https://truecairn.app/security/limits): everything we do not
+  protect against, have not built, or have never tested — including that no
+  release has ever been completed by a human, and that the out-of-band
+  safety-number call is unenforceable.
+- [Disclosure policy](https://truecairn.app/security/disclosure): how to report a
+  vulnerability, what we ask of researchers, and the first-response commitment.
+- [Service status](https://truecairn.app/status): live component status and
+  measured availability, answering one question — could a release ceremony
+  complete right now? An outage cannot release a vault.
+
+## Company
+
+- [About](https://truecairn.app/company/about): why the product exists and the
+  principle it is engineered around — the day we cannot help you is the day it
+  must hold.
+- [Contact](https://truecairn.app/company/contact): general and support, security
+  reports under the disclosure policy, and press. Email, read by a small team.
+- [Press kit](https://truecairn.app/company/press): approved boilerplate, a fact
+  sheet, brand marks and screenshots free to publish — plus a plain list of what
+  we will and will not claim about ourselves.
+
+## Legal
+
+- [Privacy policy](https://truecairn.app/legal/privacy): what is collected, why,
+  and for how long — and where architecture, not policy, is what protects you.
+- [Terms of service](https://truecairn.app/legal/terms): the terms governing use
+  of Truecairn. A working skeleton, to be finalised with counsel before launch.
+- [Data processing agreement](https://truecairn.app/legal/dpa): how Truecairn
+  processes personal data as a processor on a customer's behalf. For individual
+  consumer accounts the privacy policy governs instead.
+- [Sub-processors](https://truecairn.app/legal/sub-processors): the third-party
+  providers Truecairn may use and what each one handles. None of them can read a
+  vault: it is encrypted on the owner's device before it ever leaves.
+- [Wind-down playbook](https://truecairn.app/legal/wind-down): what happens to a
+  vault if the company shuts down, is acquired, or goes out of business. Your
+  protection cannot depend on our survival — so it does not.

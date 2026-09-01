@@ -1,0 +1,37 @@
+# Truecairn — https://truecairn.app
+#
+# NOTE ON CLOUDFLARE. The zone has "Managed robots.txt" enabled, which PREPENDS
+# Cloudflare's own block (its AI-crawler directives) to this response. That is
+# deliberate and we are not fighting it — which is why everything below is
+# valid standalone rather than relying on being the first or only group in the
+# file. If you ever see directives here you did not write, that is the edge.
+#
+# The Disallow list is the authenticated surface. None of it is secret — a
+# robots.txt is a public document and listing a path is not a security control
+# (the real gates are the session checks in apps/api). It is here so crawlers do
+# not waste budget on routes that render a login redirect, and so those pages
+# never surface in a search result.
+
+User-agent: *
+Allow: /
+
+# Authenticated and auth-adjacent client routes (apps/web/src/App.tsx).
+Disallow: /vault
+Disallow: /settings
+Disallow: /engine
+Disallow: /ceremony
+Disallow: /assistant
+Disallow: /contacts
+Disallow: /onboarding
+Disallow: /unlock
+Disallow: /admin
+Disallow: /upgrade
+Disallow: /home
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
+
+# The API. Not a crawlable surface at all.
+Disallow: /v1
+
+Sitemap: https://truecairn.app/sitemap.xml
