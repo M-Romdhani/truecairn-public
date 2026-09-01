@@ -1,0 +1,32 @@
+{
+  "name": "truecairn",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Digital continuity platform — codename truecairn",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r --workspace-concurrency=1 test",
+    "lint": "eslint .",
+    "db:migrate": "pnpm --filter @truecairn/db migrate",
+    "db:reset": "pnpm --filter @truecairn/db reset",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "build:web": "pnpm --filter @truecairn/web build",
+    "gen:sitemap": "node scripts/sitemap.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.10.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^2.1.8"
+  }
+}

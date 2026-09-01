@@ -1,0 +1,111 @@
+name: release
+
+# Tag-triggered release build with SLSA build provenance (docs/BUILDING.md).
+#
+# WHY THIS EXISTS. Truecairn's central claim is that the server never sees
+# plaintext — but the crypto enforcing that is JavaScript the server hands the
+# browser. A compromised or coerced origin could serve one targeted user a
+# modified bundle, and nothing in the product could detect it. That is the
+# structural weakness of all browser-delivered E2EE and the cheapest attack on
+# this product.
+#
+# Attestation does not eliminate it (nothing served from the same origin can —
+# the checker is served by the thing it checks). It changes the economics: a
+# tampered bundle must survive comparison against an artifact cryptographically
+# signed by a build that ran from public source on infrastructure the attacker
+# does not control. Silent, targeted, deniable tampering becomes tampering that
+# leaves evidence. The public /security/build page states exactly this limit
+# rather than implying the checkmark is proof.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  # Manual runs are useful for rehearsing the workflow before a real tag.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Required by actions/attest-build-provenance to mint the signed attestation.
+  id-token: write
+  attestations: write
+
+jobs:
+  build:
+    name: build + attest the web bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
+      - uses: actions/setup-node@v4
+        with:
+          # Pinned: the bundle digest is only comparable across builds if the
+          # toolchain is. A minor Node bump can change output bytes, which would
+          # read to a verifier as tampering.
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Typecheck before publishing anything under a signed attestation: an
+      # attestation over a broken artifact is worse than no attestation, because
+      # it lends the artifact credibility it has not earned.
+      - run: pnpm -r typecheck
+
+      - name: Build the SPA + emit the digest manifest
+        env:
+          BUILD_COMMIT: ${{ github.sha }}
+          BUILD_REF: ${{ github.ref_name }}
+        run: pnpm --filter @truecairn/web build
+
+      # Determinism check: build twice and require byte-identical digests. If the
+      # build is not reproducible, "rebuild from source and compare" is advice we
+      # cannot honestly give, so this fails the release rather than shipping a
+      # provenance page that overpromises.
+      - name: Verify the build is reproducible
+        env:
+          BUILD_COMMIT: ${{ github.sha }}
+          BUILD_REF: ${{ github.ref_name }}
+        run: |
+          FIRST=$(node -p "require('./apps/web/dist/build-manifest.json').bundleDigest")
+          cp apps/web/dist/build-manifest.json /tmp/first-manifest.json
+          rm -rf apps/web/dist
+          pnpm --filter @truecairn/web build
+          SECOND=$(node -p "require('./apps/web/dist/build-manifest.json').bundleDigest")
+          echo "build 1: $FIRST"
+          echo "build 2: $SECOND"
+          if [ "$FIRST" != "$SECOND" ]; then
+            echo "::error::Build is NOT reproducible — the same source produced different bundles."
+            echo "The /security/build page tells users they can rebuild and compare; that must stay true."
+            diff <(jq -S .assets /tmp/first-manifest.json) \
+                 <(jq -S .assets apps/web/dist/build-manifest.json) || true
+            exit 1
+          fi
+          echo "bundleDigest=$SECOND" >> "$GITHUB_ENV"
+
+      # The signed provenance: what was built, from which source, by which
+      # workflow. This is the artifact /security/build tells people to check.
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: 'apps/web/dist/**'
+
+      - name: Publish the bundle + manifest as release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist-${{ github.ref_name }}
+          path: apps/web/dist
+          if-no-files-found: error
+
+      - name: Summarise
+        run: |
+          {
+            echo "### Release ${{ github.ref_name }}"
+            echo
+            echo "- commit: \`${{ github.sha }}\`"
+            echo "- bundleDigest: \`${bundleDigest}\`"
+            echo "- reproducible: verified (two builds, identical digests)"
+            echo
+            echo "Compare this digest against the one shown on /security/build."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,12 @@
+-- 0043_drop_contact_invite_email.sql
+-- Remove the orphaned contacts.invite_email column.
+--
+-- The column was captured at invite time but never read or dispatched: invite
+-- tokens are delivered OUT OF BAND by the owner (the token is a capability — it
+-- must not travel by email), and at invite time the contact has no account and
+-- no verified notification channel to send to anyway. So the stored address
+-- served no function while adding a needless PII footprint. Dropping it removes
+-- the "collect an address nothing uses" inconsistency and tightens data
+-- minimisation. (The contact_invitation notification purpose stays — invites are
+-- owner-delivered by design; see packages/notifications/src/templates.ts.)
+ALTER TABLE contacts DROP COLUMN IF EXISTS invite_email;

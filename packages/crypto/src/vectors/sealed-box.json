@@ -1,0 +1,11 @@
+{
+  "source": "Frozen libsodium-wrappers-sumo output. No public KAT exists for crypto_box_seal because the ephemeral X25519 keypair is freshly generated at encryption time and ciphertext is therefore non-deterministic. This fixture covers (a) decryption of a frozen ciphertext yields the expected plaintext, (b) ciphertext length matches the 32-byte ephemeral pubkey + plaintext + 16-byte tag structure.",
+  "recipient": {
+    "seed": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "publicKey": "4701d08488451f545a409fb58ae3e58581ca40ac3f7f114698cd71deac73ca01",
+    "secretKey": "3d94eea49c580aef816935762be049559d6d1440dede12e6a125f1841fff8e6f"
+  },
+  "plaintextAscii": "share material — recipient owns the X25519 secret",
+  "plaintextHex": "7368617265206d6174657269616c20e2809420726563697069656e74206f776e73207468652058323535313920736563726574",
+  "frozenCiphertext": "4117def8db95c185c4624f3ad48534173b6b69eceb7a42392444d44a2a5e0e037cb52059800a8c6996caea4027848193d250a27a4a2351ada5e73c9b6dab817d069d5e1f47077a8c84e5dec6282ca3d922272d52a8e064755e9a268a209cf153905923"
+}

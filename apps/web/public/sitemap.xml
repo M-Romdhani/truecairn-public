@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  GENERATED FILE — do not edit by hand. Run `pnpm gen:sitemap` (scripts/sitemap.mjs).
+
+  The public, crawlable routes — exactly the set matched by isPublicContentPath()
+  in apps/web/src/main.tsx, plus "/" itself. Authenticated routes are deliberately
+  absent; they are also Disallow-ed in /robots.txt.
+
+  Absolute URLs on the canonical apex origin (docs/33): www and truecairn.xyz
+  301 to it at the Cloudflare edge, so listing either here would advertise a URL
+  that redirects.
+
+  <lastmod> is the git commit date of the source file holding that page's prose —
+  never the build date, which would restamp all seventeen pages on every deploy
+  and teach crawlers our dates mean nothing. A route whose date cannot be
+  established gets no lastmod at all rather than a guess: an omitted lastmod is
+  ignored by crawlers, a wrong one is believed. Same reasoning as /status
+  refusing to publish an unearned uptime figure.
+
+  No <changefreq> or <priority>: Google has stated it ignores both.
+
+  Kept in sync by apps/api/src/spa-routes.test.ts, which fails if a public route
+  exists in the app but not in this file, and if any recorded date is stale
+  relative to the source it was taken from.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://truecairn.app/</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es"/></url>
+  <url><loc>https://truecairn.app/es</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es"/></url>
+  <url><loc>https://truecairn.app/guide</loc><lastmod>2026-08-07</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/guide"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/guide"/></url>
+  <url><loc>https://truecairn.app/es/guide</loc><lastmod>2026-08-07</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/guide"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/guide"/></url>
+  <url><loc>https://truecairn.app/changelog</loc><lastmod>2026-08-31</lastmod></url>
+  <url><loc>https://truecairn.app/status</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/status"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/status"/></url>
+  <url><loc>https://truecairn.app/es/status</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/status"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/status"/></url>
+  <url><loc>https://truecairn.app/security</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security"/></url>
+  <url><loc>https://truecairn.app/es/security</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security"/></url>
+  <url><loc>https://truecairn.app/security/ai</loc><lastmod>2026-08-25</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/ai"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/ai"/></url>
+  <url><loc>https://truecairn.app/es/security/ai</loc><lastmod>2026-08-25</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/ai"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/ai"/></url>
+  <url><loc>https://truecairn.app/security/build</loc><lastmod>2026-08-24</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/build"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/build"/></url>
+  <url><loc>https://truecairn.app/es/security/build</loc><lastmod>2026-08-24</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/build"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/build"/></url>
+  <url><loc>https://truecairn.app/security/disclosure</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/disclosure"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/disclosure"/></url>
+  <url><loc>https://truecairn.app/es/security/disclosure</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/disclosure"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/disclosure"/></url>
+  <url><loc>https://truecairn.app/security/limits</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/limits"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/limits"/></url>
+  <url><loc>https://truecairn.app/es/security/limits</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/limits"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/limits"/></url>
+  <url><loc>https://truecairn.app/security/threat-model</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/threat-model"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/threat-model"/></url>
+  <url><loc>https://truecairn.app/es/security/threat-model</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/security/threat-model"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/security/threat-model"/></url>
+  <url><loc>https://truecairn.app/legal/privacy</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://truecairn.app/legal/terms</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://truecairn.app/legal/dpa</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://truecairn.app/legal/sub-processors</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://truecairn.app/legal/wind-down</loc><lastmod>2026-08-25</lastmod></url>
+  <url><loc>https://truecairn.app/company/about</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/company/about"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/company/about"/></url>
+  <url><loc>https://truecairn.app/es/company/about</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/company/about"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/company/about"/></url>
+  <url><loc>https://truecairn.app/company/contact</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/company/contact"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/company/contact"/></url>
+  <url><loc>https://truecairn.app/es/company/contact</loc><lastmod>2026-08-23</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/company/contact"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/company/contact"/></url>
+  <url><loc>https://truecairn.app/company/press</loc><lastmod>2026-08-24</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/company/press"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/company/press"/></url>
+  <url><loc>https://truecairn.app/es/company/press</loc><lastmod>2026-08-24</lastmod><xhtml:link rel="alternate" hreflang="en" href="https://truecairn.app/company/press"/><xhtml:link rel="alternate" hreflang="es" href="https://truecairn.app/es/company/press"/></url>
+</urlset>

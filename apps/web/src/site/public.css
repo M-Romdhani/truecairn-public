@@ -1,0 +1,458 @@
+/* ===========================================================================
+   Public content pages (security, legal, company, changelog, guide-when-public).
+   Depends on the design system tokens (styles/design-system.css) and .btn; the
+   shared marketing footer brings Landing.css. Class-only — the SPA CSP forbids
+   inline styles, so everything here is a class.
+   =========================================================================== */
+
+.pub { background: var(--bg); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Lightweight header — brand + the two CTAs, no section anchors (those only make
+   sense on the landing page). Mirrors the .mk-nav treatment. */
+.pub-header {
+  position: sticky; top: 0; z-index: 30;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.pub-header-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 14px 32px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.pub-header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* Readable prose column. */
+.pub-main {
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 56px 32px 88px;
+}
+
+.pub-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--text-3); text-decoration: none;
+  margin-bottom: 32px;
+  transition: color var(--t);
+}
+.pub-back:hover { color: var(--text-1); }
+.pub-back span { font-size: 14px; }
+
+.pub-eyebrow {
+  font-size: 12px; color: var(--accent); letter-spacing: 0.06em;
+  text-transform: uppercase; font-weight: 600; margin: 0 0 8px;
+}
+.pub-title {
+  font-family: var(--font-display);
+  font-size: 36px; line-height: 1.15; letter-spacing: -0.02em;
+  font-weight: 600; color: var(--text-1); margin: 0;
+}
+.pub-updated { font-size: 13px; color: var(--text-3); margin: 14px 0 0; }
+
+/* Sibling-page pill nav (security / legal / company families). */
+.pub-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; }
+.pub-pill {
+  font-size: 13px; font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color var(--t), color var(--t), background var(--t);
+}
+.pub-pill:hover { border-color: var(--border-strong); color: var(--text-1); }
+.pub-pill.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+/* ——— Prose ——— */
+.pub-prose { margin-top: 36px; color: var(--text-2); }
+.pub-prose > :first-child { margin-top: 0; }
+.pub-prose h2 {
+  font-family: var(--font-display);
+  font-size: 22px; line-height: 1.3; letter-spacing: -0.012em;
+  font-weight: 600; color: var(--text-1);
+  margin: 48px 0 0;
+  scroll-margin-top: 88px; /* clear the sticky header when jumped to via #anchor */
+}
+.pub-prose h3 {
+  font-size: 17px; line-height: 1.35; font-weight: 600; color: var(--text-1);
+  margin: 28px 0 0;
+  scroll-margin-top: 88px;
+}
+.pub-prose p { font-size: 16px; line-height: 1.7; margin: 16px 0 0; max-width: 68ch; }
+.pub-prose ul, .pub-prose ol { margin: 14px 0 0; padding-left: 22px; max-width: 68ch; }
+.pub-prose li { font-size: 16px; line-height: 1.7; margin: 6px 0; }
+.pub-prose li::marker { color: var(--text-3); }
+.pub-prose strong { color: var(--text-1); font-weight: 600; }
+.pub-prose a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.pub-prose a:hover { text-decoration: underline; }
+/* A .btn inside prose is a button, not a link: `.pub-prose a` out-specifies the
+   base `.btn` colour, which painted accent-on-accent (invisible) on the primary.
+   Restore each variant's own ink and keep the design's rule that no button is
+   ever underlined. */
+.pub-prose a.btn { color: #fff; }
+.pub-prose a.btn.ghost { color: var(--text-2); }
+.pub-prose a.btn.ghost:hover { color: var(--text-1); }
+.pub-prose a.btn:hover { text-decoration: none; }
+.pub-prose code {
+  font-family: ui-monospace, Menlo, monospace; font-size: 0.88em;
+  background: #f1f5f9; border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 5px; color: var(--text-1);
+}
+
+/* A defined-terms / key-facts callout (used in security + guide). */
+.pub-note {
+  margin: 24px 0 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+}
+.pub-note p { margin: 8px 0 0; }
+.pub-note > :first-child { margin-top: 0; }
+
+/* A slightly larger opening paragraph, for pages that lead with a summary, and a
+   small caveat line that sits tight under whatever it qualifies. Both selectors
+   carry the element so they out-specify `.pub-prose p` without !important. */
+.pub-prose p.pub-lede { font-size: 17px; line-height: 1.65; color: var(--text-1); }
+.pub-prose p.pub-fine { font-size: 13px; color: var(--text-3); margin-top: 10px; }
+
+/* Honest "no reports yet" state for independent reviews. */
+.pub-empty {
+  margin: 16px 0 0;
+  padding: 18px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  font-size: 15px; color: var(--text-2); line-height: 1.6;
+}
+
+/* ——— Changelog ——— */
+.pub-log { margin: 36px 0 0; list-style: none; padding: 0; }
+.pub-log-entry { padding: 24px 0; border-top: 1px solid var(--border); }
+.pub-log-entry:first-child { border-top: none; }
+.pub-log-date {
+  font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+  color: var(--text-3); letter-spacing: 0.02em;
+}
+.pub-log-entry h2 { font-family: inherit; font-size: 18px; font-weight: 600; letter-spacing: -0.008em; margin: 6px 0 0; }
+.pub-log-entry ul { margin-top: 12px; }
+
+/* ===========================================================================
+   Press (/company/press) — the boilerplate, fact sheet, brand assets and
+   screenshots. Cards on the sheet, one accent, no decoration that carries no
+   information.
+   =========================================================================== */
+
+.pr-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 0; }
+
+/* Copy-me boilerplate: a labelled header strip over the exact text we approve. */
+.pr-copy {
+  margin: 16px 0 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+.pr-copy-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.pr-copy-meta {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--text-3);
+}
+.pr-copy-btn {
+  font: inherit; font-size: 12px; font-weight: 600;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--t), background var(--t), color var(--t);
+}
+.pr-copy-btn:hover { border-color: var(--border-strong); color: var(--text-1); }
+.pub-prose .pr-copy-body { margin: 0; padding: 16px; font-size: 15px; line-height: 1.7; max-width: none; }
+
+/* Fact sheet: a key/value table that collapses to stacked rows on narrow screens. */
+.pr-facts {
+  margin: 16px 0 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+.pr-fact {
+  display: grid; grid-template-columns: 190px 1fr; gap: 16px;
+  padding: 13px 18px;
+  border-top: 1px solid var(--border);
+}
+.pr-fact:first-child { border-top: none; }
+.pr-fact-k { font-size: 13px; font-weight: 600; color: var(--text-3); }
+.pr-fact-v { font-size: 14px; line-height: 1.6; color: var(--text-2); }
+
+/* Asset and screenshot cards. The four marks sit 2×2 rather than auto-fitting:
+   the prose column takes exactly three 210px cards, which would orphan the
+   fourth. The three screenshots auto-fit to one row at that same width. */
+.pr-assets, .pr-shots {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0 0;
+}
+.pr-assets { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pr-shots { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.pr-asset {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color var(--t);
+}
+.pr-asset:hover { border-color: var(--border-strong); }
+.pr-asset-frame {
+  height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid var(--border);
+}
+/* The three backgrounds each mark is drawn FOR, so a reviewer can see at a glance
+   which file belongs on which surface. */
+.pr-asset-frame.light { background: var(--bg); }
+.pr-asset-frame.ink { background: #12142b; }
+.pr-asset-frame.mono { background: #f2f1ec; }
+.pr-shot {
+  display: block; width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover; object-position: top left;
+  border-bottom: 1px solid var(--border);
+}
+.pr-asset-meta { padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.pr-asset-name { font-size: 14px; font-weight: 600; color: var(--text-1); }
+.pr-asset-file { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--text-3); }
+.pub-prose a.pr-dl {
+  margin-top: 2px;
+  font-size: 12px; font-weight: 600;
+  color: var(--text-2); text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 5px 10px;
+  transition: border-color var(--t), color var(--t);
+}
+.pub-prose a.pr-dl:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
+.pr-swatches { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+.pr-swatch {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  padding: 10px 12px;
+}
+.pr-swatch-chip {
+  width: 26px; height: 26px; flex: none;
+  border-radius: var(--r-sm);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+.pr-swatch-chip.accent { background: var(--accent); }
+.pr-swatch-chip.accent-hover { background: var(--accent-hover); }
+/* Literal, not var(--accent): the wordmark's blue is deliberately its own value
+   (see .wm-ai) and a swatch that tracked the accent token would misreport it. */
+.pr-swatch-chip.wordmark-ai { background: #002fd7; }
+.pr-swatch-chip.ink { background: #12142b; }
+.pr-swatch-chip.sheet { background: #fafaf9; }
+.pr-swatch-text { display: flex; flex-direction: column; gap: 1px; }
+.pr-swatch-name { font-size: 12px; font-weight: 600; color: var(--text-1); }
+.pr-swatch-hex { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--text-3); }
+
+/* ===========================================================================
+   Status (/status) — prose, not tiles. The two cards at the top carry the whole
+   point of the page: an outage cannot release your vault, and every state shown
+   is measured rather than asserted.
+   =========================================================================== */
+
+.st-headline {
+  margin: 8px 0 0;
+  padding: 24px 26px;
+  border: 1px solid #d9e2e1;
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--success-soft) 0%, var(--surface) 100%);
+}
+.st-none {
+  margin: 14px 0 0;
+  padding: 18px 20px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+}
+
+/* The live verdict card. Neutral-surfaced rather than tinted by state: the
+   colour carried by the dot is enough, and a full-card red would shout outage
+   for a degraded supporting check. */
+.st-live {
+  margin: 14px 0 0;
+  padding: 20px 22px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.st-live-head { display: flex; align-items: baseline; gap: 10px; }
+.st-live-verdict {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+.pub-prose .st-live-verdict { margin: 0; }
+.pub-prose .st-live-sub { margin: 10px 0 0; font-size: 14px; line-height: 1.65; }
+.pub-prose .st-live-stale {
+  margin: 8px 0 0; font-size: 13px; color: var(--text-2); font-style: italic;
+}
+
+/* Measured availability. The figure is large because it is the one number on
+   the page; the note under it is not small print — it is the caveat that makes
+   the number honest, so it stays at body size. */
+.st-avail {
+  margin: 18px 0 0;
+  padding: 20px 22px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.st-avail-figure { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.st-avail-pct {
+  font-family: var(--font-display);
+  font-size: 34px; font-weight: 600; letter-spacing: -0.02em;
+  color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+}
+.st-avail-label { font-size: 15px; color: var(--text-1); }
+.pub-prose .st-avail-note { margin: 12px 0 0; font-size: 14px; line-height: 1.65; color: var(--text-2); }
+/* The no-figure-yet case is the DEFAULT state of a new deployment, so it is
+   styled as a considered statement rather than as an error. */
+.pub-prose .st-avail-none {
+  margin: 18px 0 0;
+  padding: 16px 18px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+  font-size: 14px; line-height: 1.7;
+}
+.st-headline-row { display: flex; align-items: baseline; gap: 10px; }
+.pub-prose .st-headline p, .pub-prose .st-none p { margin: 10px 0 0; }
+.st-headline-title {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 600; letter-spacing: -0.012em;
+  color: var(--text-1);
+}
+.st-none-title { font-size: 15px; font-weight: 600; color: var(--text-1); }
+.pub-prose .st-headline-title, .pub-prose .st-none-title { margin: 0; }
+
+/* The state dot, shared by the two cards and the state legend. `unknown` is a
+   hollow ring on purpose — it must never be mistakable for a green tile. */
+.st-dot { width: 10px; height: 10px; border-radius: 999px; flex: none; transform: translateY(2px); }
+.st-dot.ok { background: var(--success); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.16); }
+.st-dot.degraded { background: var(--warning); box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.16); }
+.st-dot.down { background: var(--danger); box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.16); }
+.st-dot.unknown { background: var(--surface); border: 1.5px solid #94a3b8; }
+
+.st-watch-list { display: flex; flex-direction: column; gap: 8px; margin: 20px 0 0; }
+.st-watch {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  padding: 15px 18px;
+  transition: border-color var(--t);
+}
+.st-watch:hover { border-color: var(--border-strong); }
+.st-watch-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+}
+/* Inline-flex so the live dot sits with the name and wraps as one unit; the dot
+   is nudged back to centre since its shared rule offsets it for baseline rows. */
+.st-watch-name {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 600; color: var(--text-1);
+}
+.st-watch-name .st-dot { transform: none; }
+.st-tag {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10.5px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600;
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+.st-tag.critical { color: var(--accent-hover); background: var(--accent-soft); border: 1px solid #cbd9ff; }
+.st-tag.supporting { color: var(--text-3); background: #f5f5f2; border: 1px solid var(--border); }
+.pub-prose .st-watch-detail { margin: 5px 0 0; font-size: 14px; line-height: 1.65; }
+
+.st-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px;
+  margin: 20px 0 0;
+}
+.st-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  padding: 16px 18px;
+}
+.pub-prose .st-card p { margin: 0; font-size: 14px; line-height: 1.65; max-width: none; }
+.pub-prose .st-card-label {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 7px;
+}
+
+.st-states { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+.st-state {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  padding: 7px 14px 7px 11px;
+}
+.st-state .st-dot { width: 9px; height: 9px; transform: none; }
+.st-state-label { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.st-state-meaning { font-size: 13px; color: var(--text-3); }
+
+@media (max-width: 640px) {
+  .pr-fact { grid-template-columns: 1fr; gap: 4px; }
+  .pr-assets { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ——— Guide table of contents ——— */
+.guide-toc {
+  margin: 36px 0 0;
+  padding: 20px 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+}
+.guide-toc h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); margin: 0; font-weight: 600; }
+.guide-toc ol { margin: 14px 0 0; padding-left: 22px; columns: 2; column-gap: 32px; }
+.guide-toc li { font-size: 14px; line-height: 1.6; margin: 4px 0; break-inside: avoid; }
+.guide-toc a { color: var(--text-2); text-decoration: none; }
+.guide-toc a:hover { color: var(--accent); text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .pub-header-inner { padding: 12px 20px; }
+  .pub-main { padding: 36px 20px 64px; }
+  .pub-title { font-size: 30px; }
+  .pub-prose h2 { font-size: 21px; }
+  .guide-toc ol { columns: 1; }
+}
+
+/* The 404 page shows the URL that failed. It is arbitrary, attacker-chosen and
+   can be very long, so it has to wrap anywhere rather than force a horizontal
+   scrollbar on the whole prose column. Class, not an inline style: this SPA is
+   served with `style-src 'self'` and no 'unsafe-inline'. */
+.pub-break { word-break: break-all; overflow-wrap: anywhere; }

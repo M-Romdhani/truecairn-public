@@ -1,0 +1,37 @@
+{
+  "source": "Frozen Truecairn outputs for the contact key fingerprint (safety number). The INPUT key material is not ours — the X25519 public keys are RFC 7748 §5.2 (alice/bob) and the Ed25519 public keys are RFC 8032 §7.1 (TEST 1/TEST 2), reused from x25519.json and ed25519.json so this file introduces no unattributed key bytes. The digests and rendered numbers are regression fixtures: they pin the domain string, the length-prefixed framing, the key ORDER, and the digits-from-digest rendering. Any client that shows a contact safety number must reproduce these exactly, because two clients that disagree turn a mismatch into a false alarm and an alarm nobody trusts is worse than no alarm.",
+  "construction": "digest = BLAKE2b-256( lp(domain) || lp(x25519_pubkey) || lp(ed25519_pubkey) ), lp(x) = u32_be(len(x)) || x. Rendering: 6 groups, each 5 digest bytes big-endian mod 100000, zero-padded to 5 digits, space-separated.",
+  "domain": "truecairn/contact-key-fingerprint/v1",
+  "groups": 6,
+  "groupDigits": 5,
+  "vectors": [
+    {
+      "name": "RFC 7748 alice X25519 + RFC 8032 TEST 1 Ed25519",
+      "x25519PublicKeyHex": "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+      "ed25519PublicKeyHex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+      "expectedDigestHex": "a3af4435808db3bd51074b14f26f8190e9e2df5b827b20067a4e9c418ed0c045",
+      "expectedSafetyNumber": "52192 17447 79777 50267 44858 91184"
+    },
+    {
+      "name": "RFC 7748 bob X25519 + RFC 8032 TEST 2 Ed25519",
+      "x25519PublicKeyHex": "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f",
+      "ed25519PublicKeyHex": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+      "expectedDigestHex": "1bb962a10d20ae9031e7c4297560c3706c5745426b4c6e97ece07e6bf601bd93",
+      "expectedSafetyNumber": "65709 39015 48355 95842 16940 78849"
+    },
+    {
+      "name": "PARTIAL SUBSTITUTION — alice X25519 with TEST 2's Ed25519. This is the attack the two-key fingerprint exists to catch: one genuine key, one swapped. It must not equal either vector above.",
+      "x25519PublicKeyHex": "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+      "ed25519PublicKeyHex": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+      "expectedDigestHex": "87c0cd50ad8cfb974ed1985b5e2dff4bcf7eef1f725aaea3c12bfdb1985472ae",
+      "expectedSafetyNumber": "65965 18769 27807 49663 66369 68244"
+    },
+    {
+      "name": "SLOT ORDER — vector 1's two keys passed in the opposite slots. Length prefixing alone would not separate these (both keys are 32 bytes), so this pins that the slots are positional and not interchangeable.",
+      "x25519PublicKeyHex": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+      "ed25519PublicKeyHex": "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
+      "expectedDigestHex": "a06428c572dc9f9998979beba4afcce0099119970eff81b988254752db66c861",
+      "expectedSafetyNumber": "60946 48535 69548 78519 33864 02406"
+    }
+  ]
+}

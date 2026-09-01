@@ -1,0 +1,45 @@
+{
+  "name": "@truecairn/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && pnpm run prerender && node ../../scripts/build-manifest.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests",
+    "test": "vitest run --passWithNoTests",
+    "e2e": "playwright test",
+    "prerender": "vite build --ssr src/prerender.tsx --outDir .prerender --emptyOutDir --logLevel warn && node .prerender/prerender.js"
+  },
+  "dependencies": {
+    "@fontsource/figtree": "^5.2.10",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/poppins": "^5.2.7",
+    "@simplewebauthn/browser": "^13.0.0",
+    "@tanstack/react-query": "^5.62.0",
+    "@truecairn/audit": "workspace:*",
+    "@truecairn/ceremony": "workspace:*",
+    "@truecairn/client-crypto": "workspace:*",
+    "@truecairn/crypto": "workspace:*",
+    "@truecairn/keys": "workspace:*",
+    "@truecairn/shared": "workspace:*",
+    "i18next": "^23.16.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-i18next": "^15.7.4",
+    "react-router-dom": "^7.18.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@truecairn/db": "workspace:*",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "vite": "^5.4.0"
+  }
+}

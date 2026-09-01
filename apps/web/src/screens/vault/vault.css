@@ -1,0 +1,204 @@
+/* Vault-screen helpers (scoped). Depends on the design system for tokens. */
+.vault-row-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 500;
+  color: var(--text-1);
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--t);
+}
+.vault-row-btn:hover {
+  color: var(--accent);
+}
+.vault-meta {
+  font-size: 12px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+.vault-item-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-1);
+  background: #FCFCFB;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px;
+  margin: 0;
+}
+
+/* Attachment picker: a dashed drop zone + the selected-file list. Shared by the
+   create form and the item detail (AttachmentPicker). */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-md);
+  padding: 14px;
+  background: #FCFCFB;
+  transition: border-color var(--t), background var(--t);
+}
+.dropzone.dropzone-over {
+  border-color: var(--accent);
+  background: #F5F7FF;
+}
+.dropzone > p {
+  margin: 0;
+}
+.pick-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pick-list > li {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+}
+
+/* ——— Filing queue: items a phone sealed and sent (docs/34) ——— */
+
+/* Header row: title left, count right, hairline under — the card's own
+   sub-structure rather than a second card, because the queue belongs to the
+   vault page and not beside it. */
+.filing-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--md);
+  padding-bottom: var(--md);
+  border-bottom: 1px solid var(--border);
+}
+.filing-count {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  border: 1px solid #D8E4FA;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* The release-plan consequence. A sunken band, not an alert: this is a fact
+   about how filing works, and someone should be able to read it once and move
+   on. Red would make a permanent property of the design look like a fault, and
+   the same panel would then cry wolf every time a capture arrived. Same
+   treatment as .vault-item-body, which is the page's existing "quiet inset"
+   idiom. */
+.filing-note {
+  background: #FCFCFB;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+}
+/* 600 in text-1 — the same treatment .pub-prose gives an emphasised lead
+   sentence. The browser default 700 would be heavier than any heading on the
+   page, which is how a calm statement starts looking like a warning. */
+.filing-note strong {
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.filing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.filing-list > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--md);
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+/* The list sits directly under the note, so the first row's rule would double
+   up with the block above it. */
+.filing-list > li:first-child {
+  border-top: none;
+}
+.filing-meta {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: var(--text-1);
+}
+.filing-actions {
+  display: flex;
+  gap: var(--sm);
+  flex: none;
+}
+
+/* Inline states, above the rows. Tone carries the meaning: danger for "it did
+   not happen", warning for "it half happened and the capture is still here". */
+.filing-alert {
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.filing-alert.error {
+  background: var(--danger-soft);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  color: var(--danger);
+}
+.filing-alert.partial {
+  background: var(--warning-soft);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  color: var(--warning);
+}
+
+/* ——— Expandable list rows ———
+   The row keeps its single-line shape; the detail opens beneath it inside the
+   same <li>, so the list never reflows into a grid of cards. */
+.vault-row { flex-direction: column; align-items: stretch; gap: 0; }
+.w-full { width: 100%; }
+.vault-row-expand { flex: none; }
+
+.vault-row-detail {
+  width: 100%;
+  padding: var(--md) 0 var(--xs);
+  border-top: 1px dashed var(--border);
+  margin-top: 12px;
+}
+
+/* The sealed-content prompt reuses .dropzone (same dashed, sunken affordance as
+   the attachment picker) but is never a drop target, so it does not take the
+   hover state that would imply you can put something in it. */
+.vault-row-detail .dropzone { cursor: default; }
+.vault-row-detail .dropzone:hover { border-color: var(--border-strong); background: var(--surface-sunken); }
+
+/* Drag handle. Hidden until the row is hovered so a list nobody is rearranging
+   stays quiet, and only rendered at all when the whole list is shown — see
+   canReorder in VaultList. */
+.vault-grip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-3);
+  opacity: 0;
+  cursor: grab;
+  transition: opacity var(--t);
+}
+.vault-row:hover .vault-grip,
+.vault-row:focus-within .vault-grip { opacity: 1; }
+.vault-row.dragging { opacity: 0.5; }
+.vault-row.dragging .vault-grip { cursor: grabbing; }
+
+/* Pointer-driven reordering is a convenience, never the only way to work here.
+   Anyone who prefers reduced motion still gets the same list. */
+@media (prefers-reduced-motion: reduce) {
+  .vault-grip { transition: none; }
+}

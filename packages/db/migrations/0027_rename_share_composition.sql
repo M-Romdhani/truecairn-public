@@ -1,0 +1,12 @@
+-- 0027_rename_share_composition.sql
+-- change_release_threshold was a misnomer. The s2=2-of-3 / s3=3-of-4 thresholds
+-- are LOCKED decisions (docs/01) enforced at the schema level by the
+-- user_tier_keys CHECK, and must NOT be changeable by a runtime user action — the
+-- enforcement stays in the schema so an application-layer bug can't drift it. The
+-- real operation is changing which FACTOR fills a release-share slot (e.g. swap the
+-- S3 hardware-key share for a second professional contact) — a release_shares
+-- composition change, same threat class as add_contact. Rename the enum value to
+-- match its actual job. No rows reference the old value (it was never built).
+--
+-- RENAME VALUE (unlike ADD VALUE) runs inside a transaction without restriction.
+ALTER TYPE sensitive_action_type RENAME VALUE 'change_release_threshold' TO 'change_share_composition';

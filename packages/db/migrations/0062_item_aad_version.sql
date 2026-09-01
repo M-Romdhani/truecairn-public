@@ -1,0 +1,51 @@
+-- 0062_item_aad_version.sql
+-- Item-identity binding for the per-item key and the title (audit finding F3).
+--
+-- The gap: nothing bound an item's ciphertext to the item it belonged to. The
+-- per-item key was AAD-bound to its TIER only, and the title had no AAD at all.
+-- A server with write access could therefore permute titles and contents among
+-- same-tier items of the same owner — swap two S2 items' envelopes and each
+-- decrypts perfectly, under the wrong title. The server reads neither, so this
+-- is not a confidentiality break; it is an authenticity one, and it lands at
+-- RELEASE, in front of a recipient who cannot tell that the item labelled "Bank
+-- details" is holding something else.
+--
+-- v2 binds both layers to the item id, which the CLIENT now chooses before
+-- encrypting. (Server-assigned ids were the stated reason this was not done
+-- originally; a client-generated UUID dissolves it.)
+--
+-- WHAT THIS DOES TO EXISTING ROWS — read before deploying.
+--
+-- Rows that predate this migration were written with the v1 construction, and
+-- there is NO v1 reader: the client asserts the version and refuses anything but
+-- the current one. So every pre-existing item becomes unreadable when this
+-- deploys, with a clear "unsupported item AAD version 1" rather than a mystery
+-- decryption failure.
+--
+-- That is deliberate and was checked against production before landing: 36 vault
+-- items across 21 owners, all of them pre-launch test data. Carrying a v1 reader
+-- and its permanent doubled test matrix for a population that will never exist
+-- is the more expensive mistake. The cost of a format change is zero today and
+-- rises monotonically after the first real customer item — this is the last
+-- moment it is free, so it is being spent here.
+--
+-- If you are reading this because real items became unreadable, that assumption
+-- was wrong and the fix is a v1 reader restored from git history (the branch was
+-- deleted in the commit that followed this migration), NOT a data migration —
+-- the server cannot re-encrypt anything.
+--
+-- The version is recorded rather than inferred because the two constructions are
+-- not distinguishable from the ciphertext: at v1 the title was encrypted with NO
+-- additionalData, and "absent AAD" is a different AEAD input from "empty AAD".
+-- The column stays after v1's removal as the mechanism for the NEXT format
+-- change, and it is read and asserted on every unwrap — never written-and-
+-- ignored, which is the trap outer_key_encryption_aad already sets.
+ALTER TABLE vault_items
+  ADD COLUMN aad_version smallint NOT NULL DEFAULT 1;
+
+-- 1 stays in the CHECK: pre-existing rows genuinely ARE version 1, and labelling
+-- them 2 would make them claim a binding they do not carry — the same lie, with
+-- a worse diagnostic. Every new write emits 2; `wrapItemKey` takes the item id
+-- as a required argument, so a v1 wrap is not expressible in the client.
+ALTER TABLE vault_items
+  ADD CONSTRAINT vault_items_aad_version_known CHECK (aad_version IN (1, 2));

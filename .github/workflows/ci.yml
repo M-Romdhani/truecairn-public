@@ -1,0 +1,231 @@
+name: ci
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The full vitest workspace gate + typecheck + the web build + a dependency
+  # audit. Runs every package's tests against a real Postgres, exactly like the
+  # local gate. (The suite is ~1,540 tests across 17 packages; the count is
+  # deliberately not written here — it was stale by a factor of two for months,
+  # and a number nobody updates is worse than no number.)
+  test:
+    name: vitest workspace + typecheck
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: truecairn
+          POSTGRES_PASSWORD: truecairn
+          POSTGRES_DB: truecairn_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U truecairn -d truecairn_dev"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql://truecairn:truecairn@localhost:5432/truecairn_dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Apply migrations (0001..latest)
+        run: pnpm db:migrate
+      - name: Typecheck (workspace)
+        run: pnpm -r typecheck
+
+      # Type-aware lint, one pass over the workspace (~60s). Deliberately a tiny
+      # rule set — no-floating-promises + no-misused-promises — because the strict
+      # tsconfig already covers what a general ESLint preset would add, and an
+      # unawaited promise is the one live bug class it cannot see. apps/api,
+      # apps/worker and every package are at zero and this BLOCKS them; apps/web's
+      # 23 known warnings (react-router 7 made `navigate()` promise-returning) do
+      # not fail the run. See eslint.config.mjs for why each severity is what it is.
+      - name: Lint (type-aware)
+        run: pnpm lint
+
+      # Build on EVERY push, not only on a release tag. Until 2026-08-09 `pnpm
+      # build` ran solely in release.yml (`v*` tags), so a build-breaking change
+      # stayed green through every push and would first surface while cutting a
+      # tag — which is also the moment provenance is minted. Discovering the
+      # client does not compile while trying to publish a signed artifact of it
+      # is the worst possible time to find out. Placed before the tests because
+      # it takes ~30s and fails fast.
+      #
+      # This is the full pipeline the deploy runs: vite build → prerender →
+      # build-manifest. The prerender step is the one that catches SSR-hostile
+      # changes (a browser-only global at module scope renders fine in the SPA
+      # and throws here), and the manifest step is what /security/build reads.
+      - name: Build (SPA + prerender + manifest)
+        run: pnpm --filter @truecairn/web build
+
+      # Audit what actually SHIPS. `--prod` excludes devDependencies, which is
+      # what makes this gate green enough to stay blocking: the dev tree carries
+      # advisories against vitest/vite/esbuild that do not reach a user, and a
+      # gate that is red for reasons nobody will act on teaches people to ignore
+      # it — the same failure mode that let a red E2E hide a live regression.
+      #
+      # Clean as of 2026-08-09 (26 advisories, 4 on the production path, all
+      # cleared: react-router 6→7, @fastify/static 9→10, and find-my-way /
+      # fast-uri / protobufjs pinned forward via pnpm-workspace.yaml overrides).
+      # Ratchet to `moderate` once that has held for a while; do not loosen it.
+      - name: Audit production dependencies
+        run: pnpm audit --prod --audit-level high
+
+      # Visibility without blocking: dev-only advisories are real work, just not
+      # release-blocking work. Surfaced here so they cannot accumulate unseen
+      # again — 26 of them had, because nothing ever ran this.
+      - name: Audit dev dependencies (informational)
+        run: pnpm audit --audit-level high || true
+
+      - name: Test (full workspace)
+        run: pnpm test
+
+  # The real-browser gate: the enrollment ceremony E2E (real WASM libsodium +
+  # the provision chain) on a headless Chromium. The trace + report upload ONLY
+  # on failure — GitHub artifact storage is quota-limited and a green run needs no
+  # trace (a passing run was uploading ~43 files every push and exhausting the
+  # account quota) — with short retention.
+  #
+  # The upload is additionally BARRED FROM DECIDING THIS JOB (`continue-on-error`),
+  # which is the lesson of run #430 (2026-08-18). That run read, at a glance, as
+  # "CI is red because artifact storage is full": the job's last error was
+  # `Failed to CreateArtifact: Artifact storage quota has been hit`. It was not.
+  # The E2E step had genuinely failed 30 seconds earlier — `2 failed, 12 passed
+  # (6.6m)`, both the S2-second-recipient and S3 ceremony specs timing out on an
+  # empty `released-content` — and the upload only ran BECAUSE of that failure.
+  # The quota error then buried the test failure under an infrastructure one.
+  #
+  # That is the failure mode worth engineering against, and it cuts both ways: an
+  # artifact problem must never be mistaken for a test failure, and must never
+  # mask one either. A storage quota is not a statement about the code, so it may
+  # not colour this job's conclusion. The `steps.e2e.conclusion` guard is the same
+  # idea one level tighter — a bare `failure()` would also fire when `pnpm
+  # install` or the migration step died, and there are no traces to collect then.
+  #
+  # The quota driver named here — `trace: 'on'` uploading all 14 specs when only
+  # the failures need one — was FIXED on 2026-08-22. playwright.config.ts now sets
+  # `retain-on-failure`.
+  #
+  # Keep the history, because the prediction came true in the worst available way.
+  # The quota filled, `CreateArtifact` began failing with "Artifact storage quota
+  # has been hit", and the `continue-on-error` above did exactly what it was
+  # written to do: it kept an artifact problem from colouring the job. The
+  # combined effect was a step reporting SUCCESS while uploading nothing, so CI
+  # silently stopped capturing traces and looked entirely healthy doing it. The
+  # intermittent ceremony failures of 2026-08-21/22 (3, then 4, then 2 specs on
+  # consecutive runs) could not be diagnosed, because the artifact that would
+  # explain them was never stored — and nothing anywhere said so.
+  #
+  # The lesson is not that continue-on-error was wrong; it is right, and stays.
+  # It is that a swallowed failure needs somewhere to be visible. Here the log
+  # carried `##[error]Failed to CreateArtifact` all along, while the step badge
+  # read green — so the evidence existed and the summary contradicted it.
+  e2e:
+    name: playwright enrollment E2E
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: truecairn
+          POSTGRES_PASSWORD: truecairn
+          POSTGRES_DB: truecairn_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U truecairn -d truecairn_dev"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql://truecairn:truecairn@localhost:5432/truecairn_dev
+      # The browser serves the app from the preview origin; WebAuthn registration
+      # is verified against this origin, so it MUST match (default :3001 is wrong).
+      WEBAUTHN_RP_ID: localhost
+      WEBAUTHN_ORIGIN: http://localhost:4173
+      # Ceremony-completion E2E: globalSetup boots the real worker; these compress
+      # the ceremony time windows + the worker poll via CONFIG (no test-mode code).
+      CEREMONY_REVOCATION_WINDOW_MS: '1000'
+      CEREMONY_SYNC_WINDOW_MS: '600000'
+      WORKER_POLL_INTERVAL_MS: '500'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      # A shared SERVER_AUDIT_SIGNING_KEY makes the API + worker write ONE consistent
+      # audit chain — the worker's add_contact apply links sensitive_actions.
+      # audit_id_terminal → audit_log.id, so a real signed entry is required (the
+      # log-only port returns a fake id and the FK fails). The throwaway key is
+      # GENERATED fresh each run rather than committed: even a CI-only private key
+      # doesn't belong in the repo, where it reads as a leaked secret and could be
+      # copy-pasted into a real deployment.
+      - name: Generate per-run throwaway audit signing key
+        run: echo "SERVER_AUDIT_SIGNING_KEY=$(openssl genpkey -algorithm ed25519 -outform DER | base64 -w0)" >> "$GITHUB_ENV"
+      - run: pnpm install --frozen-lockfile
+      - name: Apply migrations (0001..latest)
+        run: pnpm db:migrate
+      - name: Install Chromium + system deps
+        run: pnpm --filter @truecairn/web exec playwright install --with-deps chromium
+      - name: E2E (boots API + preview + worker, runs the ceremony spine)
+        id: e2e
+        run: pnpm --filter @truecairn/web e2e
+      - name: Upload Playwright trace + report
+        # Only when the TESTS failed — not when an earlier step (install,
+        # migrate, browser download) did, which produces no trace to collect.
+        if: ${{ failure() && steps.e2e.conclusion == 'failure' }}
+        # An artifact-storage problem is not a statement about the code. It may
+        # not fail this job, and it may not stand in front of the test result
+        # that is the actual reason the job is red. See run #430 above.
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-trace
+          path: |
+            apps/web/test-results
+            apps/web/playwright-report
+          if-no-files-found: ignore
+          # Long enough to debug the run that produced it, short enough that a
+          # bad week of red runs cannot re-exhaust the quota. Traces are only
+          # ever read within a day or two of the failure; nothing reads a
+          # three-week-old one.
+          retention-days: 3
+
+  # The Flutter client (apps/mobile, docs/32). Its own job because it shares
+  # nothing with the pnpm workspace — no Node, no Postgres, no TypeScript — and a
+  # Dart failure should read as a Dart failure rather than colouring the API gate.
+  # Analyze + test only: a store build needs signing material that does not
+  # belong in CI, and M1 has no crypto to prove against the shared vectors yet.
+  mobile:
+    name: flutter analyze + test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Analyze (zero issues)
+        run: flutter analyze
+      - name: Test (unit + widget)
+        run: flutter test

@@ -1,0 +1,46 @@
+{
+  "source": "GF(256) field KAT: FIPS 197 §4.2.1 (0x57 · 0x83 = 0xc1). Shamir end-to-end KAT: deterministic fixed-byte random source — see shamir.test.ts.",
+  "url": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197.pdf",
+  "gfMulPairs": [
+    {"a": "57", "b": "83", "expected": "c1"},
+    {"a": "53", "b": "ca", "expected": "01"},
+    {"a": "ff", "b": "ff", "expected": "13"},
+    {"a": "00", "b": "ff", "expected": "00"},
+    {"a": "01", "b": "0a", "expected": "0a"}
+  ],
+  "deterministicSplit": {
+    "secretHex": "deadbeefcafebabe",
+    "threshold": 3,
+    "totalShares": 4,
+    "randomStream": "0102030405060708090a0b0c0d0e0f10111213141516",
+    "expectedShares": [
+      "01ddaabde0c9f9b9a1",
+      "02d4bbacc1f0d898e0",
+      "03d7bcafcef3df9bff",
+      "04fae1ca734e126e99"
+    ]
+  },
+  "constrainedSplit": {
+    "comment": "shamirSplitWithConstraint KAT. The share at constraint.shareIndex MUST equal the supplied constraint.value bytes by construction. All other shares are determined by the constraint plus the deterministic-RNG free coefficients (zero free coeffs for k=2).",
+    "secretHex": "deadbeefcafebabe",
+    "k2_threshold2_n3_constraintAt3": {
+      "constraintValueHex": "1111111122222222",
+      "randomStreamHex": "00",
+      "expectedShares": [
+        "019b30db4c92433bca",
+        "02548c74b27a9fa356",
+        "031111111122222222"
+      ]
+    },
+    "k3_threshold3_n4_constraintAt4": {
+      "constraintValueHex": "3333333344444444",
+      "randomStreamHex": "0102030405060708",
+      "expectedShares": [
+        "012b0d59cc75431325",
+        "0229fa61b1b18be1a3",
+        "03dc5a86920e364838",
+        "043333333344444444"
+      ]
+    }
+  }
+}

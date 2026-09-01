@@ -1,0 +1,38 @@
+-- Make /dispute idempotent per affirmation (2026-08-07 security audit, finding 3).
+--
+-- THE BUG. `POST /v1/ceremonies/:id/dispute` authorised via loadFor, which asks
+-- only "does an affirmation row exist for this ceremony whose contact is you?" —
+-- no status filter of any kind. It was the ONLY loadFor consumer that read
+-- neither the affirmation status nor the ceremony status: /affirm gates on both,
+-- /revoke on the affirmation, both seal routes on the affirmation plus recovery
+-- eligibility. Dispute was the sole exception, and nothing bounded how often it
+-- could be called.
+--
+-- The reported impact — unbounded audit-log growth and repeated contention on
+-- the per-user audit_log_locks row — does NOT occur, and it is worth writing down
+-- why so nobody re-derives it: after the first dispute cancelCeremoniesForUser
+-- finds no LIVE ceremonies to cancel, and the engine's dispute_raised returns
+-- no_change from review_required, so applyEvent skips all persistence and
+-- audit.append is never entered. Each repeat costs one pointless UPDATE.
+--
+-- The real defect is a REPEATABLE VETO. The owner's only exit from
+-- review_required is POST /v1/engine/resolve-review, which costs them a fresh
+-- second factor. A contact could immediately push it straight back, indefinitely
+-- — including a contact whose ceremony finished months ago, since those rows are
+-- never deleted. One contact could hold an owner's release hostage for as long as
+-- they cared to.
+--
+-- disputed_at is the compare-and-swap target: the route claims the dispute with
+-- `WHERE id = $1 AND disputed_at IS NULL`, so a second call finds zero rows and
+-- returns the same answer without touching the engine. One dispute per
+-- affirmation, ever. A NEW ceremony creates a NEW affirmation row, so a contact
+-- who genuinely believes the owner is alive can still dispute each fresh release
+-- attempt — the single-contact veto is deliberately kept, it is only bounded.
+--
+-- Backfill note: existing rows get NULL, i.e. "has not disputed". That is the
+-- right default. Any dispute already raised has already had its effect on the
+-- engine, and pre-dating them would silently strip a live contact of a veto they
+-- have not yet used.
+
+ALTER TABLE ceremony_affirmations
+  ADD COLUMN disputed_at timestamptz;

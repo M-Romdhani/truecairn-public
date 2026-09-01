@@ -1,0 +1,21 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# pnpm 10 reads overrides from here, not package.json#pnpm (which only warns).
+#
+# Every pin here exists to keep a CVE-affected build out of the PRODUCTION tree —
+# the one `pnpm audit --prod --audit-level high` gates in CI. These are transitive
+# dependencies we do not name directly, so the only way to move them ahead of
+# their parent's range is an override. All four are semver-compatible with what
+# the parent asked for (a minor or patch), so the parent keeps working; drop a
+# pin once its parent's own range has caught up, not before.
+overrides:
+  # CVE-affected v8-era build.
+  uuid: ^11.1.1
+  # HTTP/2 DDoS (GHSA). fastify 5.11 still resolves 9.6.0.
+  find-my-way: ^9.7.0
+  # Host confusion ×3. Reached via fastify > @fastify/ajv-compiler.
+  fast-uri: ^3.1.5
+  # Reached via @google/genai. 7.6.5 is a patch on the range genai already asks for.
+  protobufjs: ^7.6.5

@@ -1,0 +1,201 @@
+/* ===========================================================================
+   Upgrade page (task 4): a focused, standalone plan-value + checkout page the
+   Plans "Upgrade" button lands on. Its own back-arrow top bar (no app sidebar).
+   Depends on the design system for tokens, .btn and .alert. Class-only (the SPA
+   CSP forbids inline styles).
+   =========================================================================== */
+.upgrade-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Back-arrow bar — the way out, like the reference upgrade flow. */
+.upgrade-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 14px var(--lg);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.upgrade-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--r-sm);
+  transition: color var(--t);
+}
+.upgrade-back:hover { color: var(--text-1); }
+.upgrade-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.upgrade-main {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--2xl) var(--lg) var(--xl);
+}
+
+.upgrade-head { text-align: center; margin-bottom: var(--xl); }
+.upgrade-title {
+  font-family: var(--font-display, inherit);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+  margin: 0 0 12px;
+}
+.upgrade-lead {
+  max-width: 620px;
+  margin: 0 auto 24px;
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Monthly / Yearly pill switch. */
+.upgrade-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.upgrade-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background var(--t), color var(--t);
+}
+.upgrade-switch button.active { background: var(--text-1); color: #fff; }
+.upgrade-save {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(39, 67, 240, 0.12);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.upgrade-switch button.active .upgrade-save { color: #fff; background: rgba(255, 255, 255, 0.2); }
+
+/* Tier grid. align-items:stretch makes all three boxes the SAME height (the
+   tallest card sets the row); each card is a flex column so its feature list
+   sits flush at the bottom regardless of how much copy is above it. */
+/* Two tiers, because two tiers exist (2026-08-01: the advertised third — "Pro,
+   Custom pricing" with governance/SAML/notary — was never built). Centred and
+   width-capped so a two-card row does not read as a three-card row with a
+   missing card, matching .mk-pricing on the landing page. */
+.upgrade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+  max-width: 720px;
+  margin-inline: auto;
+}
+.upgrade-tier {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 28px 24px;
+}
+.upgrade-tier.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+.upgrade-tier-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-1);
+  margin-bottom: 12px;
+}
+.upgrade-pop {
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.upgrade-price { display: flex; align-items: baseline; gap: 4px; }
+.upgrade-price .amount { font-size: 34px; font-weight: 600; color: var(--text-1); letter-spacing: -0.02em; }
+.upgrade-price .cents { font-size: 18px; color: var(--text-2); }
+.upgrade-price .per { font-size: 14px; color: var(--text-3); margin-left: 2px; }
+.upgrade-sub { font-size: 13px; color: var(--text-2); margin: 6px 0 0; }
+.upgrade-tier-desc { font-size: 14px; color: var(--text-2); line-height: 1.5; margin: 14px 0 20px; }
+
+.upgrade-cta { margin-bottom: 20px; }
+/* A disabled "Your plan" / "Current plan" chip reuses .btn look but is inert. */
+.upgrade-cta .btn[aria-disabled='true'] { opacity: 0.55; pointer-events: none; }
+
+/* margin-top:auto pushes the checklist to the card bottom so, with equal-height
+   cards, the three feature lists bottom-align regardless of copy length. */
+.upgrade-feats { list-style: none; margin: auto 0 0; padding: 20px 0 0; border-top: 1px solid var(--border); }
+.upgrade-feats li {
+  position: relative;
+  padding: 8px 0 8px 24px;
+  font-size: 14px;
+  color: var(--text-1);
+}
+.upgrade-feats li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Cross-card row alignment, same treatment as .mk-pricing on the landing page.
+   Only Personal carries a billing line, so laid out independently the two cards
+   put their buttons at different heights and — because the lists are pushed to
+   the card bottom above — started their feature lists at different heights too.
+   The five blocks (name / price / copy / CTA / list) share ONE set of row tracks
+   via subgrid, so both buttons sit on one line and both lists start on one line.
+   Scoped to the two-column layout; below 860px the cards stack and the flex
+   fallback above applies. Must stay AFTER the rules it overrides — same
+   specificity, so source order decides. */
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 861px) {
+    /* row-gap 0: a subgrid inherits the parent's gutters, and any row gap here
+       would reappear as space between the blocks INSIDE each card. */
+    .upgrade-grid { grid-template-rows: repeat(5, auto); row-gap: 0; }
+    .upgrade-tier { display: grid; grid-row: span 5; grid-template-rows: subgrid; }
+    /* The shared row already aligns the lists; margin-top:auto would push the
+       shorter one to the bottom of it and undo that. */
+    .upgrade-feats { margin-top: 0; align-self: start; }
+  }
+}
+
+.upgrade-note { text-align: center; margin-top: 24px; color: var(--text-2); font-size: 14px; }
+.upgrade-alert { margin-top: 24px; }
+.upgrade-fineprint {
+  text-align: center;
+  margin-top: 32px;
+  color: var(--text-3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 860px) {
+  .upgrade-grid { grid-template-columns: 1fr; }
+  .upgrade-title { font-size: 28px; }
+  .upgrade-main { padding: var(--xl) var(--lg); }
+}

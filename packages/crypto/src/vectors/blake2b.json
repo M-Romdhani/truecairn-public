@@ -1,0 +1,27 @@
+{
+  "source": "BLAKE2b-256 canonical test vectors. The 'abc' and empty-string vectors are widely published (BLAKE2 reference implementations, various crypto libraries' test suites — independent of libsodium). The keyed vector is a frozen libsodium output for regression detection.",
+  "url": "https://www.rfc-editor.org/rfc/rfc7693 + the BLAKE2 reference at https://github.com/BLAKE2/BLAKE2",
+  "unkeyed": [
+    {
+      "name": "BLAKE2b-256(\"abc\")",
+      "messageAscii": "abc",
+      "outputLength": 32,
+      "expectedHex": "bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319"
+    },
+    {
+      "name": "BLAKE2b-256(\"\") — empty input",
+      "messageHex": "",
+      "outputLength": 32,
+      "expectedHex": "0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8"
+    }
+  ],
+  "keyed": [
+    {
+      "name": "BLAKE2b-256(message=\"hello\", key=0xab*16)",
+      "messageAscii": "hello",
+      "keyHex": "abababababababababababababababab",
+      "outputLength": 32,
+      "expectedHex": "f2a0b8442121ed61c71b3a6332d29e0879c56a890fcba208c2a4b92531265f2c"
+    }
+  ]
+}

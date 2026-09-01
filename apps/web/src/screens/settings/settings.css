@@ -1,0 +1,69 @@
+/* ——— Audit trail ———
+   A real list, not a stack of nested cards. Each row opens to the hash-chain
+   detail, which is the thing that makes the entry evidence rather than a note. */
+.audit-list { max-height: 520px; overflow-y: auto; }
+
+.audit-row { flex-direction: column; align-items: stretch; gap: 0; }
+
+.audit-row-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  min-width: 0;
+}
+.audit-row-btn .row-title {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.audit-row-btn:hover .row-title { color: var(--accent); }
+
+.audit-when { flex: none; font-size: 12px; white-space: nowrap; }
+
+.audit-detail {
+  width: 100%;
+  margin-top: 12px;
+  padding: var(--md);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+/* Digests are for comparing character by character, so they get the mono face
+   and enough tracking to tell 0 from O. */
+.audit-hash {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+  word-break: break-all;
+}
+
+@media (max-width: 640px) {
+  .audit-when { display: none; }
+}
+
+/* The cadence field is a number of days, not a paragraph — a full-width input
+   invites the wrong kind of answer. */
+.cadence-field { max-width: 220px; }
+
+/* ——— Verification channels ———
+   Rows separated by a rule so a list of four reads as four things, not one
+   paragraph. The last one carries no rule — the card edge already ends it. */
+.channel-row { padding-bottom: var(--md); border-bottom: 1px solid var(--border); }
+.channel-row:last-of-type { padding-bottom: 0; border-bottom: none; }
+
+/* Interval and its Save button share a line, so the field does not stretch to
+   the full card width and leave the action stranded below it. */
+.cadence-line { align-items: flex-end; }
+.cadence-line .cadence-field { margin-bottom: 0; }

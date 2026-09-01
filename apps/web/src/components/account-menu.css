@@ -1,0 +1,90 @@
+/* ===========================================================================
+   Sidebar account menu (2026 design): an email header, then plain text rows —
+   no leading icons — with Sign out separated at the foot. Depends on
+   design-system tokens + .avi. Class-only (SPA CSP forbids inline styles).
+   =========================================================================== */
+.acct { position: relative; }
+
+/* Trigger chip — avatar, two-line label, and an unfold chevron on the right. */
+.acct-trigger {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--t);
+}
+.acct-trigger:hover { background: rgba(15, 23, 42, 0.04); }
+.acct-label { flex: 1; min-width: 0; }
+.acct-trigger-name {
+  font-size: 13px; font-weight: 500; color: var(--text-1);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.acct-trigger-status { font-size: 12px; color: var(--text-3); }
+.acct-trigger-tier { color: var(--text-2); font-weight: 500; }
+.acct-unfold { color: var(--text-3); flex-shrink: 0; }
+
+/* Popover, opening UPWARD from the trigger (it sits at the foot of the sidebar). */
+.acct-pop {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0; right: 0;
+  z-index: 40;
+  min-width: 236px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 16px 40px -16px rgba(15, 23, 42, 0.3), 0 4px 12px -6px rgba(15, 23, 42, 0.12);
+  padding: 6px;
+  display: flex; flex-direction: column; gap: 1px;
+}
+
+/* Header (no avatar here — the chip below carries it, like Claude): the name
+   (when set), then the email, then the plan + lock status. */
+.acct-head { padding: 8px 10px 6px; }
+.acct-head-name {
+  font-size: 13px; font-weight: 600; color: var(--text-1);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.acct-head-email {
+  font-size: 13px; font-weight: 500; color: var(--text-1);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* With a name above it, the email is the secondary line. */
+.acct-head-name + .acct-head-email { font-weight: 400; color: var(--text-2); font-size: 12px; margin-top: 1px; }
+.acct-head-status { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+.acct-sep { height: 1px; background: var(--border); margin: 5px 0; }
+
+/* Rows: plain text label (no leading icon in the 2026 design). */
+.acct-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text-1);
+  text-decoration: none;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  transition: background var(--t), color var(--t);
+}
+.acct-item-label { flex: 1; min-width: 0; }
+
+.acct-item:hover { background: rgba(15, 23, 42, 0.04); }
+.acct-item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.acct-item.danger { color: var(--danger); }
+.acct-item.danger:hover { background: var(--danger-soft); }
+
+.acct-item[disabled] { color: var(--text-3); cursor: default; }
+.acct-item[disabled]:hover { background: transparent; }

@@ -1,0 +1,904 @@
+/* ===========================================================================
+   Marketing landing — the 2026 redesign (design-reference "Landing Redesign").
+   A dark video hero, then alternating light/ink "sheets" with rounded tops
+   stacked over each other, Poppins display type over Figtree body text, and
+   the signature asymmetric corner radius (sharp top-left, round bottom-right).
+   Class-only styling — the SPA CSP forbids inline styles. The shared marketing
+   footer (SiteFooter) also lives here so the public content pages can reuse it.
+   =========================================================================== */
+
+:root {
+  --mk-ink: #12142b;        /* brand ink — dark bands, display text */
+  --mk-ink-deep: #0a0b1a;   /* hero backdrop behind the video */
+  --mk-body: #4e4b66;       /* marketing body text on light */
+  --mk-bg: #f7f7fc;         /* marketing page background */
+  --mk-line: rgba(18, 20, 43, 0.12);
+  --mk-line-inv: rgba(255, 255, 255, 0.16);
+  --mk-accent: #2743f0;
+  --mk-accent-soft: #9daaff; /* accent on ink bands */
+  --mk-font: "Figtree", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --mk-ease: cubic-bezier(0.25, 0.6, 0.3, 1);
+}
+
+.mk-land {
+  font-family: var(--mk-font);
+  color: var(--mk-ink);
+  background: var(--mk-bg);
+}
+
+/* ——— Type ——— */
+.mk-h-hero {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+  max-width: 17ch;
+}
+.mk-h-section {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+  font-weight: 600;
+  color: var(--mk-ink);
+  margin: 0;
+}
+.mk-sheet.ink .mk-h-section { color: #fff; }
+.mk-lead {
+  font-size: clamp(16px, 2vw, 19px);
+  line-height: 1.55;
+  color: var(--mk-body);
+  margin: 24px 0 0;
+  max-width: 58ch;
+}
+.mk-sheet.ink .mk-lead { color: rgba(255, 255, 255, 0.72); }
+
+/* Inline prose link. The landing's other anchors are nav items or buttons, so a
+   bare <a> inside body copy would fall back to the browser default (blue,
+   underlined) and read as a defect. Mirrors the public pages' prose-link rule
+   (.pub-prose a in site/public.css): accent, unadorned, underline on hover. */
+.mk-inline-link { color: var(--mk-accent); text-decoration: none; font-weight: 500; }
+.mk-inline-link:hover { text-decoration: underline; }
+.mk-sheet.ink .mk-inline-link { color: #fff; text-decoration: underline; }
+
+/* Eyebrow — small label with the mono cairn glyph. */
+.mk-eyebrow {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 14px; font-weight: 600;
+  color: var(--mk-body);
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  margin: 0 0 14px;
+}
+.mk-eyebrow svg { color: var(--mk-accent); flex: none; }
+.mk-eyebrow.inverse { color: rgba(255, 255, 255, 0.66); }
+.mk-eyebrow.inverse svg { color: var(--mk-accent-soft); }
+
+.mk-mono {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+}
+
+/* ——— Buttons ——— */
+/* Pill CTA with the sharp-corner radius and the dash→arrow morph. */
+.btn-mk {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: inherit;
+  font-size: 16px; font-weight: 600;
+  padding: 15px 26px;
+  border-radius: 0 26px;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.3s var(--mk-ease), color 0.3s var(--mk-ease), border-color 0.3s var(--mk-ease);
+  white-space: nowrap;
+  /* Containing block for the arriving arrow. Layout-neutral — `relative` with no
+     offsets does not move or resize this box, it only gives `.ic-arrow` something
+     to be absolute against so it can reach the right padding edge. */
+  position: relative;
+}
+.btn-mk.sm { font-size: 14px; padding: 10px 18px; border-radius: 0 18px; }
+.btn-mk.md { font-size: 15px; padding: 12px 22px; border-radius: 0 22px; }
+.btn-mk.ink { background: var(--mk-ink); color: #fff; }
+.btn-mk.ink:hover, .btn-mk.ink:focus-visible { background: var(--mk-accent); }
+.btn-mk.white { background: #fff; color: var(--mk-accent); }
+.btn-mk.white:hover, .btn-mk.white:focus-visible { background: var(--mk-accent); color: #fff; }
+.btn-mk.accent { background: var(--mk-accent); color: #fff; }
+.btn-mk.accent:hover, .btn-mk.accent:focus-visible { background: #1d33c8; }
+.btn-mk.outline { background: transparent; color: var(--mk-ink); border: 1.5px solid rgba(18, 20, 43, 0.22); }
+.btn-mk.outline:hover, .btn-mk.outline:focus-visible { border-color: var(--mk-ink); background: rgba(18, 20, 43, 0.03); }
+.btn-mk.outline-inv { background: transparent; color: #fff; border: 1.5px solid rgba(255, 255, 255, 0.35); }
+.btn-mk.outline-inv:hover, .btn-mk.outline-inv:focus-visible { border-color: #fff; background: rgba(255, 255, 255, 0.08); }
+
+/* The CTA gesture: the content DEPARTS leftward while an arrow ARRIVES on the right.
+   Three things move together over 0.3s — the dash exits left, the label follows it
+   into the space the dash vacated, and the arrow drifts in at the opposite edge.
+   It replaced a dash→arrow morph that happened in one fixed slot: tidy, but nothing
+   actually travelled, so the button read as static.
+
+   NOTHING HERE MAY CHANGE THE BUTTON'S BOX. Every rule below is either a transform
+   (which never affects layout) or an absolute position (which removes the element
+   from flow). The 22px `.btn-mk-ic` slot stays in flow and keeps its width even
+   once the dash has left it, so the label has somewhere to travel to and no
+   sibling can reflow. Do not lengthen the dash or add padding to widen the
+   gesture — tune the travel distances instead, which is what they are for. */
+.btn-mk-ic { position: relative; width: 22px; height: 12px; flex: none; }
+.btn-mk-ic .ic-dash {
+  position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+  transition: opacity 0.3s var(--mk-ease), transform 0.3s var(--mk-ease);
+}
+
+/* The label's animation handle. `inline-block` is what makes it transformable; as a
+   flex item it is blockified anyway, so this adds no box of its own and the 10px gap
+   to the dash is exactly what it was when the label was a bare text node. */
+.btn-mk-label {
+  display: inline-block;
+  transition: transform 0.3s var(--mk-ease);
+}
+
+/* Absolute, so it is not a flex item and contributes nothing to the button's width.
+   `right` matches each variant's horizontal padding so the arrow lands on the same
+   optical margin as the label's left edge in every size. */
+.btn-mk .ic-arrow {
+  position: absolute; top: 50%; right: 26px;
+  transform: translateY(-50%) translateX(-6px);
+  opacity: 0;
+  transition: opacity 0.3s var(--mk-ease), transform 0.3s var(--mk-ease);
+}
+.btn-mk.sm .ic-arrow { right: 18px; }
+.btn-mk.md .ic-arrow { right: 22px; }
+
+/* Hover and keyboard focus fire the same gesture.
+
+   The label travels exactly -32px: the 22px icon slot plus the 10px flex gap, which
+   is constant across sm/md/default because neither the slot nor the gap is sized per
+   variant. That lands the label precisely on the left padding edge — far enough to
+   read as departing, and bounded so it can never cross it. It also leaves 32px clear
+   on the right, and the arrow is 18px, so the two never collide at any size. */
+.btn-mk:hover .ic-dash, .btn-mk:focus-visible .ic-dash {
+  transform: translateY(-50%) translateX(-10px);
+  opacity: 0;
+}
+.btn-mk:hover .btn-mk-label, .btn-mk:focus-visible .btn-mk-label {
+  transform: translateX(-32px);
+}
+.btn-mk:hover .ic-arrow, .btn-mk:focus-visible .ic-arrow {
+  transform: translateY(-50%) translateX(0);
+  opacity: 1;
+}
+
+/* ——— Nav ——— */
+.mk-nav {
+  position: sticky; top: 0; z-index: 30;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--mk-line);
+}
+.mk-nav-inner {
+  max-width: 1330px; margin: 0 auto;
+  padding: 14px 32px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.mk-brand {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 16px; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--mk-ink);
+  text-decoration: none;
+}
+.mk-brand .brand-mark { width: 26px; height: 26px; }
+.mk-nav-links { display: flex; align-items: center; gap: 28px; }
+.mk-nav-links a {
+  color: var(--mk-body);
+  text-decoration: none;
+  font-size: 15px; font-weight: 600;
+  transition: color 0.3s;
+}
+.mk-nav-links a:hover { color: var(--mk-accent); }
+.mk-nav-actions { display: flex; align-items: center; gap: 10px; }
+.mk-nav-signin {
+  color: var(--mk-body);
+  text-decoration: none;
+  font-size: 14px; font-weight: 600;
+  padding: 10px 12px; border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+.mk-nav-signin:hover { background: rgba(18, 20, 43, 0.04); color: var(--mk-ink); }
+.mk-nav-toggle { display: none; }
+
+/* ——— Hero ——— */
+.mk-hero {
+  position: relative;
+  background: var(--mk-ink-deep);
+  overflow: hidden;
+  padding-bottom: 96px;
+}
+.mk-hero-video {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.mk-hero-scrim {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(10, 11, 26, 0.85) 0%, rgba(10, 11, 26, 0.55) 48%, rgba(10, 11, 26, 0.18) 100%),
+    linear-gradient(0deg, rgba(10, 11, 26, 0.72) 0%, rgba(10, 11, 26, 0) 32%);
+}
+.mk-hero-inner {
+  position: relative;
+  max-width: 1330px; margin: 0 auto;
+  padding: 104px 32px 0;
+}
+.mk-hero .mk-eyebrow { color: rgba(255, 255, 255, 0.7); text-transform: uppercase; }
+.mk-hero .mk-eyebrow svg { color: var(--mk-accent-soft); }
+.mk-hero-sub {
+  font-size: clamp(16px, 2.2vw, 19px);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 26px 0 38px;
+  max-width: 54ch;
+}
+.mk-hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; }
+.mk-hero-trust {
+  display: flex; gap: 24px; flex-wrap: wrap;
+  margin-top: 56px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ——— Sheets — the stacked rounded bands ——— */
+.mk-sheet {
+  position: relative;
+  border-radius: 48px 48px 0 0;
+  margin-top: -58px;
+  padding-bottom: 24px;
+}
+.mk-sheet.light { background: linear-gradient(277deg, #e6ebf5 4%, #fbfbfe 62%); }
+.mk-sheet.ink { background: var(--mk-ink); }
+
+.mk-section {
+  max-width: 1330px; margin: 0 auto;
+  padding: 96px 32px;
+}
+
+/* Cairn section divider (light sheets only). */
+.mk-rule {
+  max-width: 1266px; margin: 0 auto;
+  display: flex; align-items: center;
+}
+.mk-rule::before, .mk-rule::after { content: ""; flex: 1; height: 1px; background: var(--mk-line); }
+.mk-rule svg { margin: 0 12px; flex: none; color: var(--mk-accent); }
+
+/* Reveal-on-scroll. The hiding rule is scoped to body.mk-anim so the page
+   paints fully before JS is live (and for crawlers / reduced-motion). */
+[data-reveal] { transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+body.mk-anim [data-reveal]:not(.in) { opacity: 0; transform: translateY(24px); }
+@media (prefers-reduced-motion: reduce) {
+  body.mk-anim [data-reveal]:not(.in) { opacity: 1; transform: none; }
+
+  /* CTA buttons: keep the cross-fade, drop every slide. The arrow still ARRIVES and
+     the dash still leaves — they just do not travel to do it, so the state change
+     stays legible to someone who asked not to be moved. Pinning the transform on
+     both the resting and the hover/focus rule is what removes the motion; leaving
+     the opacity transitions in place is what keeps it from being an abrupt swap. */
+  .btn-mk-label { transition: none; }
+  .btn-mk:hover .btn-mk-label,
+  .btn-mk:focus-visible .btn-mk-label { transform: none; }
+
+  .btn-mk-ic .ic-dash,
+  .btn-mk:hover .ic-dash,
+  .btn-mk:focus-visible .ic-dash { transform: translateY(-50%); }
+
+  .btn-mk .ic-arrow,
+  .btn-mk:hover .ic-arrow,
+  .btn-mk:focus-visible .ic-arrow { transform: translateY(-50%); }
+}
+
+/* ——— Problem section ——— */
+.mk-problem-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 64px;
+  align-items: center;
+  margin-bottom: 72px;
+}
+.mk-photo {
+  border-radius: 0 0 0 40px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3.2;
+  background-position: center;
+  background-size: cover;
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.04);
+}
+/* Both photographs are below the fold, and a CSS background cannot be
+   loading="lazy" — so the fetch is deferred by hanging it off `.in`, the class
+   the reveal-on-scroll observer already adds when the element approaches the
+   viewport. Nothing else changes: `aspect-ratio` above reserves the box, so a
+   late-arriving background cannot shift layout.
+   Each rule declares WebP first as the fallback and then re-declares with
+   image-set(), which engines that do not understand it drop whole. */
+.mk-photo.notebook.in {
+  background-image: url("/assets/landing/photo-notebook.webp");
+  background-image: image-set(
+    url("/assets/landing/photo-notebook.avif") type("image/avif"),
+    url("/assets/landing/photo-notebook.webp") type("image/webp")
+  );
+}
+.mk-photo.vault-drawer.in {
+  background-image: url("/assets/landing/photo-vault-drawer.webp");
+  background-image: image-set(
+    url("/assets/landing/photo-vault-drawer.avif") type("image/avif"),
+    url("/assets/landing/photo-vault-drawer.webp") type("image/webp")
+  );
+}
+
+.mk-scenarios {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.mk-scenario {
+  padding: 32px;
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: 0 40px;
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.mk-scenario:hover { transform: translateY(-4px); box-shadow: 4px 18px 34px rgba(18, 20, 43, 0.1); }
+.mk-scenario .who {
+  font-size: 13px; font-weight: 600;
+  color: var(--mk-accent);
+  letter-spacing: 0.02em;
+  margin-bottom: 12px;
+}
+.mk-scenario h3 {
+  font-family: var(--font-display);
+  font-size: 19px; font-weight: 600;
+  color: var(--mk-ink);
+  margin: 0 0 10px;
+}
+.mk-scenario p { font-size: 15px; color: var(--mk-body); line-height: 1.6; margin: 0; }
+.mk-scenario.ink { background: var(--mk-ink); border-color: var(--mk-ink); }
+.mk-scenario.ink .who { color: var(--mk-accent-soft); }
+.mk-scenario.ink h3 { color: #fff; }
+.mk-scenario.ink p { color: rgba(255, 255, 255, 0.72); }
+
+/* ——— Product feature cards (ink band) ——— */
+.mk-feat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  margin-top: 56px;
+}
+.mk-feat {
+  background: #fff;
+  border-radius: 0 40px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.mk-feat:hover { transform: translateY(-4px); box-shadow: 4px 18px 34px rgba(18, 20, 43, 0.1); }
+.mk-feat-shot {
+  aspect-ratio: 16 / 10;
+  background-color: #eff0f6;
+  background-position: top left;
+  background-size: cover;
+  border-bottom: 1px solid var(--mk-line);
+}
+/* Deferred the same way as .mk-photo above — but note the selector: `data-reveal`
+   is on the parent <article class="mk-feat">, NOT on the shot, so the observer
+   adds `.in` to the ARTICLE. `.mk-feat-shot.vault.in` would match nothing and
+   these four would never load, silently (measured: 0 of 4 shots ever receive
+   `.in`; 4 of 4 articles do). The descendant form is load-bearing — if you move
+   these rules, keep `.mk-feat.in` as the ancestor. `background-color` above
+   holds the box while the image is still out of view. */
+.mk-feat.in .mk-feat-shot.vault {
+  background-image: url("/assets/landing/vault-preview.webp");
+  background-image: image-set(
+    url("/assets/landing/vault-preview.avif") type("image/avif"),
+    url("/assets/landing/vault-preview.webp") type("image/webp")
+  );
+}
+.mk-feat.in .mk-feat-shot.contacts {
+  background-image: url("/assets/landing/contacts-preview.webp");
+  background-image: image-set(
+    url("/assets/landing/contacts-preview.avif") type("image/avif"),
+    url("/assets/landing/contacts-preview.webp") type("image/webp")
+  );
+}
+.mk-feat.in .mk-feat-shot.plans {
+  background-image: url("/assets/landing/plans-preview.webp");
+  background-image: image-set(
+    url("/assets/landing/plans-preview.avif") type("image/avif"),
+    url("/assets/landing/plans-preview.webp") type("image/webp")
+  );
+}
+.mk-feat.in .mk-feat-shot.ceremony {
+  background-image: url("/assets/landing/ceremony-preview.webp");
+  background-image: image-set(
+    url("/assets/landing/ceremony-preview.avif") type("image/avif"),
+    url("/assets/landing/ceremony-preview.webp") type("image/webp")
+  );
+}
+.mk-feat-body { padding: 30px; }
+.mk-feat-eyebrow {
+  font-size: 12.5px; font-weight: 600;
+  color: var(--mk-accent);
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  margin-bottom: 8px;
+}
+.mk-feat h3 {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 600;
+  color: var(--mk-ink);
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+}
+.mk-feat p { font-size: 15px; color: var(--mk-body); line-height: 1.6; margin: 0; }
+
+/* ——— How it works (ink band) ——— */
+.mk-how {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 40px;
+  margin-top: 72px;
+}
+.mk-how-step { padding-top: 20px; border-top: 1px solid var(--mk-line-inv); }
+.mk-how-step .n {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  color: var(--mk-accent-soft);
+  margin-bottom: 14px;
+  letter-spacing: 0.04em;
+}
+.mk-how-step h4 {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 600;
+  color: #fff;
+  margin: 0 0 8px;
+}
+.mk-how-step p { font-size: 14px; color: rgba(255, 255, 255, 0.66); line-height: 1.6; margin: 0; }
+
+/* ——— Security ——— */
+.mk-security {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: 64px;
+  align-items: center;
+}
+.mk-claims {
+  margin: 32px 0 0; padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--mk-line);
+}
+.mk-claims li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 20px;
+  align-items: baseline;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--mk-line);
+}
+.mk-claims .num {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px; font-weight: 500;
+  color: var(--mk-accent);
+}
+.mk-claims .body { font-size: 15px; color: var(--mk-ink); line-height: 1.55; }
+.mk-claims .body strong { font-weight: 600; }
+.mk-claims .meta {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  color: var(--mk-body);
+}
+
+/* ——— Use cases ——— */
+.mk-cases {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 56px;
+}
+.mk-case {
+  padding: 36px;
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: 0 40px;
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.mk-case:hover { transform: translateY(-4px); box-shadow: 4px 18px 34px rgba(18, 20, 43, 0.1); }
+.mk-case-h {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.mk-case h3 {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 600;
+  color: var(--mk-ink);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.mk-case .audience {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  color: var(--mk-accent);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.mk-case > p { font-size: 15px; color: var(--mk-body); line-height: 1.65; margin: 0 0 20px; }
+.mk-case dl {
+  margin: 16px 0 0; padding: 16px 0 0;
+  border-top: 1px solid var(--mk-line);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 18px;
+  font-size: 13.5px;
+}
+.mk-case dt { color: var(--mk-body); }
+.mk-case dd { margin: 0; color: var(--mk-ink); font-weight: 500; }
+
+/* ——— Pricing ——— */
+/* Monthly / Yearly billing switch (task 3): a pill segmented control CENTERED
+   above the grid (over the featured middle card). The paid plan's price reacts
+   to it; the "Save N%" badge sits on Yearly. */
+.mk-billing-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 44px;
+}
+.mk-billing-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--mk-line);
+  border-radius: 999px;
+  background: #fff;
+}
+.mk-billing-switch button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mk-body);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.mk-billing-switch button.active { background: var(--mk-ink); color: #fff; }
+.mk-save {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mk-accent);
+  background: rgba(39, 67, 240, 0.12);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.mk-billing-switch button.active .mk-save { color: #fff; background: rgba(255, 255, 255, 0.2); }
+
+/* Two tiers, because two tiers exist (2026-08-01: the advertised third — "Pro,
+   custom pricing" with seats/SAML/notary — was never built). Centred and
+   width-capped so a two-card row does not read as a three-card row with a
+   missing card. */
+.mk-pricing {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  margin-top: 32px;
+  max-width: 780px;
+  margin-inline: auto;
+}
+/* The billed-total / savings line under the headline price. */
+.mk-tier-sub { font-size: 13px; color: var(--mk-body); margin: -2px 0 18px; line-height: 1.4; }
+.mk-tier.featured .mk-tier-sub { color: rgba(255, 255, 255, 0.66); }
+.mk-tier {
+  padding: 36px;
+  background: #fff;
+  border: 1px solid var(--mk-line);
+  border-radius: 0 40px;
+  box-shadow: 2px 8px 10px rgba(0, 0, 0, 0.04);
+  display: flex; flex-direction: column;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.mk-tier:hover { transform: translateY(-4px); box-shadow: 4px 18px 34px rgba(18, 20, 43, 0.1); }
+.mk-tier-name {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 600;
+  color: var(--mk-ink);
+  margin-bottom: 20px;
+}
+.mk-pop {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mk-font);
+  font-size: 11px; font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--mk-accent);
+  color: #fff;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.mk-pop .dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.mk-tier-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 6px; }
+.mk-tier-price .amount {
+  font-family: var(--font-display);
+  font-size: 40px; font-weight: 600;
+  color: var(--mk-ink);
+  letter-spacing: -0.02em;
+}
+.mk-tier-price .cents { font-size: 18px; color: var(--mk-body); }
+.mk-tier-price .per { font-size: 14px; color: var(--mk-body); }
+.mk-tier-desc { font-size: 14px; color: var(--mk-body); margin: 0 0 24px; line-height: 1.5; }
+.mk-tier-cta { margin-bottom: 24px; }
+.mk-tier ul {
+  margin: 0; padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--mk-line);
+}
+.mk-tier li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--mk-line);
+  font-size: 13.5px;
+  color: var(--mk-ink);
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+.mk-tier li:last-child { border-bottom: none; }
+.mk-tier .tick { color: var(--mk-accent); }
+.mk-tier .qty {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  color: var(--mk-body);
+}
+.mk-tier.featured { background: var(--mk-ink); border-color: var(--mk-ink); }
+.mk-tier.featured .mk-tier-name,
+.mk-tier.featured .mk-tier-price .amount { color: #fff; }
+.mk-tier.featured .mk-tier-price .cents,
+.mk-tier.featured .mk-tier-price .per,
+.mk-tier.featured .mk-tier-desc { color: rgba(255, 255, 255, 0.66); }
+.mk-tier.featured ul { border-top-color: var(--mk-line-inv); }
+.mk-tier.featured li { border-bottom-color: var(--mk-line-inv); color: rgba(255, 255, 255, 0.88); }
+.mk-tier.featured .tick { color: var(--mk-accent-soft); }
+.mk-tier.featured .qty { color: rgba(255, 255, 255, 0.55); }
+
+/* Cross-card row alignment. The paid card carries a billing line the free card
+   does not, and two more feature rows, so laid out independently each card put
+   its CTA and its feature list at a different height — the eye reads that as a
+   wobble, not as two cards. The five blocks (name / price / copy / CTA / list)
+   are therefore placed on ONE shared set of row tracks via subgrid: every row
+   is as tall as the taller card needs it, so "Create a free account" and "Start
+   Personal" sit on the same line, and both feature lists start on the same
+   line. Scoped to the two-column layout — below 960px the cards stack and there
+   is nothing to align against. Must stay AFTER the `.mk-tier` block above: same
+   specificity, so the flex fallback would otherwise win on source order and the
+   subgrid would silently do nothing (measured — rows came out evenly split). */
+@supports (grid-template-rows: subgrid) {
+  @media (min-width: 961px) {
+    /* row-gap 0 because a subgrid inherits the parent's gutters: any row gap
+       here would reappear as space BETWEEN the blocks inside each card. The
+       28px column gap between the two cards is unaffected. */
+    .mk-pricing { grid-template-rows: repeat(5, auto); row-gap: 0; }
+    .mk-tier { display: grid; grid-row: span 5; grid-template-rows: subgrid; }
+  }
+}
+
+/* ——— FAQ ——— */
+.mk-faq { margin-top: 56px; border-top: 1px solid var(--mk-line); }
+.mk-faq details { border-bottom: 1px solid var(--mk-line); padding: 22px 0; }
+.mk-faq summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 16px;
+  font-size: 17px; font-weight: 600;
+  color: var(--mk-ink);
+}
+.mk-faq summary::-webkit-details-marker { display: none; }
+.mk-faq summary::after {
+  content: "+";
+  font-family: ui-monospace, Menlo, monospace;
+  color: var(--mk-accent);
+  font-size: 20px;
+  transition: transform 0.3s;
+}
+.mk-faq details[open] summary::after { content: "−"; }
+.mk-faq p {
+  margin: 12px 0 0;
+  max-width: 70ch;
+  font-size: 15px;
+  color: var(--mk-body);
+  line-height: 1.65;
+}
+
+/* ——— CTA band ——— */
+.mk-cta-strip {
+  max-width: 1266px;
+  margin: 32px auto 112px;
+  border-radius: 0 64px;
+  position: relative;
+  overflow: hidden;
+  background: var(--mk-ink);
+  color: #fff;
+  padding: 84px 64px;
+}
+/* The <img> is wrapped in a <picture> for AVIF/WebP negotiation. <picture> is an
+   inline box, so on its own it would contribute a line box inside the strip; the
+   absolute positioning below still resolves against .mk-cta-strip either way,
+   because <picture> is statically positioned and establishes no containing block.
+   display: contents removes the stray box so the two are equivalent. */
+.mk-cta-strip picture { display: contents; }
+.mk-cta-photo {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 72% 42%;
+}
+.mk-cta-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, rgba(10, 11, 26, 0.72) 34%, rgba(10, 11, 26, 0.22) 68%);
+}
+.mk-cta-body { position: relative; }
+.mk-cta-strip h2 {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  line-height: 1.18;
+  margin: 0;
+  max-width: 20ch;
+}
+.mk-cta-body > p {
+  margin: 18px 0 32px;
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 44ch;
+}
+.mk-cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ——— Footer (shared with the public content pages via SiteFooter) ——— */
+.mk-footer {
+  background: #f2f1ec;
+  padding: 64px 32px 32px;
+  border-top: 1px solid var(--mk-line);
+  font-family: var(--mk-font);
+}
+/* On the landing itself the footer sits on the marketing background instead. */
+.mk-land .mk-footer { background: var(--mk-bg); }
+.mk-footer-inner {
+  max-width: 1330px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 48px;
+}
+.mk-footer-col { display: flex; flex-direction: column; gap: 10px; }
+.mk-footer-brand { margin-bottom: 8px; }
+.mk-footer-tagline {
+  font-size: 14px;
+  color: var(--mk-body);
+  margin: 0;
+  max-width: 30ch;
+  line-height: 1.6;
+}
+/* These were <h5> under an <h2> — a jump of three levels, which axe reports as
+   heading-order and which makes a screen reader's outline nonsense. They are
+   top-level sections of the <footer> landmark, so <h2> is the correct rank; the
+   size is a class, not a level. Class-based rather than `.mk-footer-col h2` so
+   the rule survives any future change of element. */
+.mk-footer-h {
+  font-size: 13px;
+  color: var(--mk-accent);
+  letter-spacing: 0.02em;
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+.mk-footer-col a {
+  color: var(--mk-body);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+.mk-footer-col a:hover { color: var(--mk-ink); }
+.mk-footer-legal {
+  max-width: 1330px;
+  margin: 48px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--mk-line);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  color: var(--mk-body);
+}
+
+/* The language control in the public footer. .mk-footer-legal is already a
+   space-between flex row, so it lands opposite the licence line without further
+   arrangement. Restyled only enough to belong to the marketing palette — the
+   picker's own markup is unchanged, and the same component serves the product
+   chrome where it keeps the product look. */
+.mk-footer-lang {
+  color: var(--mk-body);
+  font-family: inherit;
+  font-size: 12px;
+}
+.mk-footer-lang .select {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 26px 4px 8px;
+  border-color: var(--mk-line);
+  background-color: transparent;
+  color: var(--mk-ink);
+}
+.mk-footer-lang .select:hover { border-color: var(--mk-ink); }
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 960px) {
+  .mk-problem-intro, .mk-security { grid-template-columns: 1fr; gap: 32px; }
+  .mk-photo { max-height: 320px; }
+  .mk-scenarios { grid-template-columns: 1fr; }
+  .mk-feat-grid { grid-template-columns: 1fr; }
+  .mk-how { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .mk-cases, .mk-pricing { grid-template-columns: 1fr; }
+  .mk-claims li { grid-template-columns: 36px 1fr; }
+  .mk-claims .meta { grid-column: 2; }
+  .mk-cta-strip { margin: 24px 20px 72px; padding: 56px 32px; border-radius: 0 48px; }
+  .mk-footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .mk-footer-inner > .mk-footer-col:first-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 780px) {
+  /* Nav links collapse behind the hamburger. */
+  .mk-nav-inner { padding: 12px 20px; }
+  .mk-nav-links {
+    display: none;
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: #fff;
+    border-bottom: 1px solid var(--mk-line);
+    box-shadow: 0 16px 32px -16px rgba(18, 20, 43, 0.2);
+  }
+  .mk-nav-links.open { display: flex; }
+  .mk-nav-links a { padding: 14px 24px; border-top: 1px solid var(--mk-line); }
+  .mk-nav-toggle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px;
+    border: 1px solid var(--mk-line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--mk-ink);
+    cursor: pointer;
+  }
+
+  .mk-hero-inner { padding: 72px 20px 0; }
+  .mk-hero { padding-bottom: 72px; }
+  .mk-sheet { border-radius: 28px 28px 0 0; margin-top: -40px; }
+  .mk-section { padding: 64px 20px; }
+  .mk-how { grid-template-columns: 1fr; }
+  .mk-claims li { gap: 12px; }
+  .mk-case, .mk-tier, .mk-scenario { padding: 26px; border-radius: 0 32px; }
+  .mk-footer { padding: 48px 20px 24px; }
+  .mk-footer-inner { grid-template-columns: 1fr; }
+}
